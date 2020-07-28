@@ -1,0 +1,61 @@
+﻿@{
+    string svg = File.ReadAllText(@"C:\WorkSpace\bakery-squared\BakerySquared\Views\Home\TestSVG.svg");
+    string contents = File.ReadAllText(@"C:\WorkSpace\bakery-squared\BakerySquared\Views\Home\html.txt");
+    string moved = File.ReadAllText(@"C:\WorkSpace\bakery-squared\BakerySquared\Views\Home\moved.txt");
+}
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="styleSVG.css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js">
+    </script>
+    @*<script src="~/scripts/scriptSVG.js">
+    </script>*@
+</head>
+<body>
+    <form method="post">
+        <label for="Floors">Choose a floor:</label>
+        <select name="floors" id="floors">
+            <option value="Floor1">Floor 1</option>
+            <option value="Floor2">Floor 2</option>
+            <option value="Floor3">Floor 3</option>
+            <option value="Floor4">Floor 4</option>
+        </select>
+        <br /><br />
+        <input type="submit" value="Submit" />
+    </form>
+    <input type="text" placeholder="Search.." />
+
+    @{
+        var floor = Request.Form["floors"];
+    }
+    @if (floor == "Floor1" || floor == null)
+    {
+        <p>Floor 1</p>
+        @Html.Raw(contents);
+
+    }
+    @if (floor == "Floor2")
+    {
+        <p>Floor 2</p>
+        @Html.Raw(moved);
+
+    }
+    @if (floor == "Floor3")
+    {
+        <p>Floor 3</p>
+        @Html.Raw(svg);
+
+    }
+    @if (floor == "Floor4")
+    {
+        <p>Floor 4</p>
+        @Html.Raw(contents);
+
+    }
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+﻿@model BSDB.Models.Desk
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Desk</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Occupant)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Occupant)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Desk_Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
