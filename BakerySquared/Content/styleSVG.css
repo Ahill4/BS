@@ -1,0 +1,18 @@
+﻿rect:hover {
+    fill: #ff0000 !important;
+    cursor: pointer;
+}
+.social {
+    fill: green;
+    fill-opacity: .5;
+}
+
+.meeting {
+    fill: blue;
+    fill-opacity: .5;
+}
+
+.desk {
+    fill: yellow;
+    fill-opacity: .5;
+}
