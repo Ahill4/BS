@@ -244,11 +244,11 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\scriptSVG.js" />
-    <Content Include="Views\Home\html.txt" />
-    <Content Include="Views\Home\moved.txt" />
-    <Content Include="Views\Home\svg.html" />
-    <Content Include="Views\Home\testing.html" />
-    <Content Include="Views\Home\TestSVG.svg" />
+    <Content Include="Views\NoText\Floor1_no_text.svg" />
+    <Content Include="Views\NoText\Floor4_no_text.svg" />
+    <Content Include="Views\NoText\Floor5_no_text.svg" />
+    <Content Include="Views\NoText\Floor6_no_text.svg" />
+    <Content Include="Views\NoText\Floor7_no_text.svg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -294,6 +294,12 @@
     <Content Include="Views\Employees\Details.cshtml" />
     <Content Include="Views\Employees\Edit.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
+    <Content Include="Views\Home\Floor1.cshtml" />
+    <Content Include="Views\Home\Floor4.cshtml" />
+    <Content Include="Views\Home\Floor5.cshtml" />
+    <Content Include="Views\Home\Floor6.cshtml" />
+    <Content Include="Views\Home\Floor7.cshtml" />
+    <Content Include="Views\Shared\Forms.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
