@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using BSDB.Models;
 
-namespace BSDB.Controllers
+namespace BakerySquared.Controllers
 {
     public class DesksController : Controller
     {

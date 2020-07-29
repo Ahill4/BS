@@ -1,27 +1,26 @@
-
 /*
  * Global variables:
  * 
- * string lastID- a variable that contains the last clicked/searched ID for purposes of restoring its fill property on next click
- * currentFloor-when changing the select object or when routed to a new floor from search the current floor is set so it knows if 
- *              it needs to route to a new floor at certain times
- * reD- regular expression that chechs if an ID matches the appropriate format of a capital letter followed by 4 integers
+ * string lastID- a variable that contains the last clicked/searched ID for purposes of restoring its fill 
+ *                property on next click
+ * currentFloor-when changing the select object or when routed to a new floor from search the current floor 
+ *              is set so it knows if it needs to route to a new floor at certain times
+ * reD- regular expression that checks if an ID matches the appropriate format of a specific capital letter
+ *      followed by 4 integers
  * */
 var lastID;
 var currentFloor;
-var reD = /[A-Z][0-9]{4}/
-
+var reD = /(D|M|S)[0-9]{4}/
 
 /*
  * document.ready
  * 
- * Jquery function used on page load to do whatever needs done as soon as the page loads.
+ * Jquery function used on page load.
  * currently sets the current floor based on url and adds an on click listener to all elements 
  * with the ID of the format given by reD.
  * Also checks url for query paraeters and if it exists calls the necessaey functions
  */
 $(document).ready(function () {
-
     const path = window.location.pathname;
     currentFloor = path[path.length - 1];
 
@@ -40,7 +39,6 @@ $(document).ready(function () {
         ajaxCall(ID);
     }
 });
-
 
 /*
  * document.addEventListener
@@ -91,18 +89,15 @@ document.addEventListener('DOMContentLoaded', function () {
     ele.addEventListener('mousedown', mouseDownHandler);
 });
 
-
 /*
  * Function GetController
  * 
- * Called from document.ready as the onclick function given to the proper objects, calls conttroller and sets fill as needed
+ * This is the function set  on all the clickable locations that changes fill on click and makes a call to the controller with the id
  */
 function GetController() {
     let temp = $(this).attr('id');
     setFill(temp);
-
     ajaxCall(temp);
-
 }
 
 /*
@@ -115,7 +110,6 @@ function searchBar() {
     //get value entered in the search bar
     var searchedVal = document.getElementById("search").value;
 
-
     //check it to make sure it is proper format ID
     if (reD.test(searchedVal)) {
 
@@ -124,9 +118,7 @@ function searchBar() {
             window.location.href = '/Home/Floor' + searchedVal[1] + "?ID=" + searchedVal;
         }
         else if (searchedVal[1] == currentFloor) {
-
             setFill(searchedVal);
-
             ajaxCall(searchedVal);
         }
     }
@@ -161,11 +153,10 @@ function ajaxCall(ID) {
             alert(result)
         },
         error: function (response) {
-            alert('eror');
+            alert('error');
         }
     });
 }
-
 
 /*
  * Function setFloor
@@ -179,14 +170,12 @@ function setFloor() {
     }
 }
 
-
 /*
  * Function setZoom
  * 
  * takes the level of zoom given in view and the element in the mapContainer and performs transform to enlarge
  */
 function setZoom(zoom, el) {
-
     transformOrigin = [0, 0];
     el = el || instance.getContainer();
     var p = ["webkit", "moz", "ms", "o"],
@@ -200,7 +189,6 @@ function setZoom(zoom, el) {
 
     el.style["transform"] = s;
     el.style["transformOrigin"] = oString;
-
 }
 
 /*

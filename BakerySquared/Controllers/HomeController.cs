@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Controlls all the Floor views as well as ther necessary server side functions
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,9 +16,11 @@ using System.Web.Mvc;
 using System.Text.RegularExpressions;
 using BSDB.Models;
 
-namespace cshtmlMix.Controllers
+namespace BakerySquared.Controllers
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class HomeController : Controller
     {
         public ActionResult Index()
@@ -29,34 +41,29 @@ namespace cshtmlMix.Controllers
 
             return View();
         }
+
         public ActionResult Floor1()
         {
-            ViewBag.Message = "Your floor 1";
-
             return View();
         }
+
         public ActionResult Floor4()
         {
-            ViewBag.Message = "Your floor 4";
-
             return View();
         }
+
         public ActionResult Floor5()
         {
-            ViewBag.Message = "Your floor 5";
-
             return View();
         }
+
         public ActionResult Floor6()
         {
-            ViewBag.Message = "Your floor 6";
-
             return View();
         }
+
         public ActionResult Floor7()
         {
-            ViewBag.Message = "Your floor 7";
-
             return View();
         }
 
