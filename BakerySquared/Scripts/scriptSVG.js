@@ -18,7 +18,7 @@ var reD = /(D|M|S)[0-9]{4}/
  * Jquery function used on page load.
  * currently sets the current floor based on url and adds an on click listener to all elements 
  * with the ID of the format given by reD.
- * Also checks url for query paraeters and if it exists calls the necessaey functions
+ * Also checks url for query parameters and if it exists calls the necessary functions
  */
 $(document).ready(function () {
     const path = window.location.pathname;

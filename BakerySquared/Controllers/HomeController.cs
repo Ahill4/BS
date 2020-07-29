@@ -19,7 +19,7 @@ using BSDB.Models;
 namespace BakerySquared.Controllers
 {
     /// <summary>
-    /// 
+    /// Class containing the views for the Floro plans as well as controller methods to interact with database
     /// </summary>
     public class HomeController : Controller
     {
@@ -67,6 +67,11 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// takes the id sent from the client after user click and uses it to search the db
+        /// </summary>
+        /// <param name="id">id of the element that was clicked by user</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult GetController(String id)
         {
@@ -74,6 +79,13 @@ namespace BakerySquared.Controllers
             return Json(userId, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Will be used to remove all elements from the database from the current floor and refill it with 
+        /// the elements from the file. To be used to update DB after floor plan change.
+        /// </summary>
+        /// <param name="floor">a string that is passed from the client to get the specific floor user is on 
+        /// to update db</param>
+        /// <returns>returns json string to client containing all floor location ids</returns>
         [HttpGet]
         public ActionResult refillDB(String floor)
         {
@@ -84,6 +96,12 @@ namespace BakerySquared.Controllers
             return Json("Completed "+locations, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// opens the file of the floor map made in editor and searches for all ids that match the regular expression
+        /// </summary>
+        /// <param name="floor"> a string that is passed from the client to get the specific floor user is on 
+        /// to update db</param>
+        /// <returns> returns a string containing all the ids in the file that match the regular expression</returns>
         private string FileRegex(string floor)
         {
             Regex rx = new Regex("id=\"(M|D|S)[0-9]{4}\"",
