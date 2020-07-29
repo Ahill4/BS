@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * @file
+ * @brief The script used by all the floor views
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
 /*
  * Global variables:
  * 
