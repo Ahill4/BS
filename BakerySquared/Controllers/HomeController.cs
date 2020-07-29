@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Text.RegularExpressions;
 
 namespace cshtmlMix.Controllers
 {
@@ -64,12 +65,45 @@ namespace cshtmlMix.Controllers
             return Json(userId, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
-        public ActionResult refillDB(String locationsArr)
+        [HttpGet]
+        public ActionResult refillDB(String floor)
         {
-            string[] words = locationsArr.Replace("[", "").Replace("]", "").Replace("\"", "").Split(',');
 
-            return Json("Completed " + words[0], JsonRequestBehavior.AllowGet);
+            string ids = FileRegex(floor);
+            string[] locations = ids.Split(' ');
+            
+            return Json("Completed "+locations, JsonRequestBehavior.AllowGet);
         }
+
+        private string FileRegex(string floor)
+        {
+            Regex rx = new Regex("id=\"(M|D|S)[0-9]{4}\"",
+                   RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            int counter = 0;
+            string ids = "";
+            string line;
+            string path = HttpContext.Server.MapPath("~/Views/NoText/Floor" + floor + "_no_text.svg");
+
+            System.Console.WriteLine(path);
+            //Read the file and display it line by line.
+            System.IO.StreamReader file =
+                new System.IO.StreamReader(path);
+            while ((line = file.ReadLine()) != null)
+            {
+                Match match = rx.Match(line);
+                if (match.Success)
+                {
+                    string clean = line.Replace("id=\"", "").Replace("\"", "").Trim();
+                    ids = ids + " " + clean;
+                    counter++;
+                }
+
+            }
+
+            file.Close();
+            return ids;
+        }
+
     }
 }

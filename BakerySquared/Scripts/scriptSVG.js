@@ -221,15 +221,15 @@ function collectDB() {
         }
     });
     console.log(locations);
-    fillDB(locations);
+    fillDB();
 }
 
-function fillDB(locations) {
+function fillDB() {
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: 'refillDB',
         data: {
-            locationsArr: JSON.stringify(locations)
+            floor: currentFloor
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",

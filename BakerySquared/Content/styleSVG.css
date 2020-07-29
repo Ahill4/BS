@@ -1,6 +1,6 @@
 ﻿rect:hover, path:hover {
-    fill: #ff0000 !important;
-    cursor: pointer !important;
+    fill: #ff0000;
+    cursor: pointer;
 }
 
 .social {
