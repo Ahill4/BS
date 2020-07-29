@@ -71,7 +71,7 @@ namespace BakerySquared.Controllers
         /// takes the id sent from the client after user click and uses it to search the db
         /// </summary>
         /// <param name="id">id of the element that was clicked by user</param>
-        /// <returns></returns>
+        /// <returns>returns Json string containing id and hello, temp</returns>
         [HttpGet]
         public ActionResult GetController(String id)
         {
