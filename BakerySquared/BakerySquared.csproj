@@ -244,11 +244,11 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\scriptSVG.js" />
-    <Content Include="Views\NoText\Floor1_no_text.svg" />
-    <Content Include="Views\NoText\Floor4_no_text.svg" />
-    <Content Include="Views\NoText\Floor5_no_text.svg" />
-    <Content Include="Views\NoText\Floor6_no_text.svg" />
-    <Content Include="Views\NoText\Floor7_no_text.svg" />
+    <Content Include="Views\Floors\Floor1.svg" />
+    <Content Include="Views\Floors\Floor4.svg" />
+    <Content Include="Views\Floors\Floor5.svg" />
+    <Content Include="Views\Floors\Floor6.svg" />
+    <Content Include="Views\Floors\Floor7.svg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using BSDB.Models;
 
 namespace cshtmlMix.Controllers
 {
+
     public class HomeController : Controller
     {
         public ActionResult Index()
@@ -83,7 +85,7 @@ namespace cshtmlMix.Controllers
             int counter = 0;
             string ids = "";
             string line;
-            string path = HttpContext.Server.MapPath("~/Views/NoText/Floor" + floor + "_no_text.svg");
+            string path = HttpContext.Server.MapPath("~/Views/Floors/Floor" + floor + ".svg");
 
             System.Console.WriteLine(path);
             //Read the file and display it line by line.
