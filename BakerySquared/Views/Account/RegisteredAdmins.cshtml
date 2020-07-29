@@ -1,0 +1,28 @@
+﻿@model IEnumerable<BakerySquared.Models.ApplicationUser>
+@{
+    ViewBag.Title = "Registered Admins";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table table-bordered table-responsive table-hover">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+    </tr>
+    <tbody>
+        @foreach (var admin in Model)
+         {
+            if (admin.EmailConfirmed)
+            {
+                <tr>
+                    <td>@admin.FirstName &nbsp; @admin.LastName</td>
+                    <td>@admin.Email</td>
+                </tr>
+            }
+         }
+    </tbody>
+</table>

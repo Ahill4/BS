@@ -7,13 +7,14 @@
 
 <div>
     <p>
-        An email was sent to confirm your account.  If you didn't receive an email, check your email entry and select resend.
+        An email was sent to confirm the account.  If the email wasn't received, check the email entry and select resend.  
+        If the email entry is incorrect, restart registration.
     </p>
 </div>
 
-@{ 
+@{
     if (String.IsNullOrEmpty(ViewBag.errorMessage))
-    {        
+    {
     }
     else
     {

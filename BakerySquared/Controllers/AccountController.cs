@@ -74,14 +74,14 @@ namespace BakerySquared.Controllers
             }
 
             // Require the user to have a confirmed email before they can log on.
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
                 if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                 {
                     string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id);
 
-                    ViewBag.errorMessage = "You must have a confirmed email to log on.  A new confirmation email has been sent to you.";
+                    ViewBag.errorMessage = "Email has not been confirmed.  A new confirmation email has been sent to you.";
                     return View("Error");
                 }
             }
@@ -164,13 +164,20 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserName = model.Email
+                };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", callbackUrl);
+                    await UserManager.SendEmailAsync(user.Id, "Account Confirmation", callbackUrl);
 
                     return View("ResendConfirmationEmail");
                 }
@@ -180,8 +187,6 @@ namespace BakerySquared.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
-        // ************ Resend confirmation email is work in progress ****************************
 
         //
         // GET: /Account/ResendConfirmationEmail
@@ -199,8 +204,8 @@ namespace BakerySquared.Controllers
         public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailViewModel model)
         {
             if (ModelState.IsValid)
-            {   
-                var user = await UserManager.FindByNameAsync(model.Email);
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user != null)
                 {
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
@@ -217,9 +222,7 @@ namespace BakerySquared.Controllers
 
             // If we got this far, something failed, redisplay form
             return View();
-        }
-
-        // **************************************************************************************
+        }      
 
         //
         // GET: /Account/ConfirmEmail
@@ -232,6 +235,46 @@ namespace BakerySquared.Controllers
             }
             var result = await UserManager.ConfirmEmailAsync(userId, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
+        }
+
+        //
+        // 'UserSetPassword' enables the user to set their password immediately after confirming their email
+        //
+        // GET: /Account/UserSetPassword
+        [AllowAnonymous]
+        public ActionResult UserSetPassword()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/UserSetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UserSetPassword(UserSetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("Error");
+                }
+
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                model.Code = code;
+                var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         //
@@ -251,7 +294,7 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -260,7 +303,7 @@ namespace BakerySquared.Controllers
 
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", callbackUrl);
+                await UserManager.SendEmailAsync(user.Id, "Password Reset", callbackUrl);
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
@@ -450,6 +493,17 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        //
+        // GET: /Account/RegisteredAdmins
+        [AllowAnonymous]
+        public ActionResult RegisteredAdmins()
+        {
+            var context = ApplicationDbContext.Create();
+            var admins = context.Users.ToList();
+
+            return View(admins);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -532,7 +586,7 @@ namespace BakerySquared.Controllers
         {
             string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-            await UserManager.SendEmailAsync(userID, "Confirm your account", callbackUrl);
+            await UserManager.SendEmailAsync(userID, "Account Confirmation", callbackUrl);
 
             return callbackUrl;
         }

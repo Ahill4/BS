@@ -28,14 +28,24 @@ namespace BakerySquared
         }
 
         void SendMail(IdentityMessage message)
-        {                      
-            string html = " To process your request: <a href=\"" + message.Body + "\"> CLICK HERE </a><br/>\n\n"; 
-
+        {
             var msg = new MailMessage();
             msg.From = new MailAddress("bakerysquared1@gmail.com");
             msg.To.Add(new MailAddress(message.Destination));
             msg.Subject = message.Subject;
-            msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(html, null, MediaTypeNames.Text.Html));
+
+            switch (msg.Subject)
+            {
+                case "Account Confirmation":
+                    msg.Body = " To confirm your new Bakery Squared account: <a href=\"" + message.Body + "\"> Confirm Account </a><br/>\n\n";
+                    break;
+
+                case "Password Reset":
+                    msg.Body = " To reset your password for your Bakery Squared account: <a href=\"" + message.Body + "\"> Reset Password </a><br/>\n\n";
+                    break;
+            }
+
+            msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(msg.Body, null, MediaTypeNames.Text.Html));
 
             var smtp = new SmtpClient("smtp.gmail.com", Convert.ToInt32(587));
             System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("bakerysquared1", "123Password");
