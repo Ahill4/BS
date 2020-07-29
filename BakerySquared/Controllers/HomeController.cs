@@ -19,15 +19,22 @@ using BSDB.Models;
 namespace BakerySquared.Controllers
 {
     /// <summary>
-    /// Class containing the views for the Floro plans as well as controller methods to interact with database
+    /// Class containing the views for the Floor plans as well as controller methods to interact with database
     /// </summary>
     public class HomeController : Controller
     {
+        /// <summary>
+        /// Displays Index page
+        /// </summary>
+        /// <returns> view containing index data</returns>
         public ActionResult Index()
         {
             return View();
         }
-
+        /// <summary>
+        /// Displays about page
+        /// </summary>
+        /// <returns> view containing about data</returns>
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
@@ -35,6 +42,10 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays contact page
+        /// </summary>
+        /// <returns> view containing cotact data</returns>
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
@@ -42,26 +53,46 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays Floor page
+        /// </summary>
+        /// <returns> view containing floor data</returns>
         public ActionResult Floor1()
         {
             return View();
         }
 
+        /// <summary>
+        /// Displays Floor page
+        /// </summary>
+        /// <returns> view containing floor data</returns>
         public ActionResult Floor4()
         {
             return View();
         }
 
+        /// <summary>
+        /// Displays Floor page
+        /// </summary>
+        /// <returns> view containing floor data</returns>
         public ActionResult Floor5()
         {
             return View();
         }
 
+        /// <summary>
+        /// Displays Floor page
+        /// </summary>
+        /// <returns> view containing floor data</returns>
         public ActionResult Floor6()
         {
             return View();
         }
 
+        /// <summary>
+        /// Displays Floor page
+        /// </summary>
+        /// <returns> view containing floor data</returns>
         public ActionResult Floor7()
         {
             return View();
@@ -89,7 +120,6 @@ namespace BakerySquared.Controllers
         [HttpGet]
         public ActionResult refillDB(String floor)
         {
-
             string ids = FileRegex(floor);
             string[] locations = ids.Split(' ');
             
@@ -112,7 +142,6 @@ namespace BakerySquared.Controllers
             string line;
             string path = HttpContext.Server.MapPath("~/Views/Floors/Floor" + floor + ".svg");
 
-            System.Console.WriteLine(path);
             //Read the file and display it line by line.
             System.IO.StreamReader file =
                 new System.IO.StreamReader(path);
@@ -125,12 +154,10 @@ namespace BakerySquared.Controllers
                     ids = ids + " " + clean;
                     counter++;
                 }
-
             }
 
             file.Close();
             return ids;
         }
-
     }
 }
