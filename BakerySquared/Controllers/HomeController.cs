@@ -45,7 +45,7 @@ namespace BakerySquared.Controllers
         /// <summary>
         /// Displays contact page
         /// </summary>
-        /// <returns> view containing cotact data</returns>
+        /// <returns> view containing contact data</returns>
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
