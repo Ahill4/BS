@@ -1,4 +1,14 @@
-﻿using System.Data.Entity;
+﻿/*******************************************************************************
+ * @file
+ * @brief Manages the identity of users and their relationship to the datatbase.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;

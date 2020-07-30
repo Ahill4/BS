@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Manages user interactions with account functions.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -52,6 +62,11 @@ namespace BakerySquared.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets user login page.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns> Views/Account/Login.cshtml </returns>
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -61,6 +76,15 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Verifies user login credentials via AspNetUsers table of DefaultConnection database.
+        /// </summary>
+        /// <param name="model"> LoginViewModel data properties </param>
+        /// <param name="returnUrl"></param>
+        /// <returns> 
+        /// if(login success): Views/Home/Index.cshtml 
+        /// if(login failure): either Views/Shared/Error.cshtml or Views/Account/Login.cshtml 
+        /// </returns>
         //
         // POST: /Account/Login
         [HttpPost]
@@ -147,6 +171,10 @@ namespace BakerySquared.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets user registration page.
+        /// </summary>
+        /// <returns> Views/Account/Register.cshtml </returns>
         //
         // GET: /Account/Register
         [AllowAnonymous]
@@ -155,6 +183,14 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Creates new user and sends confirmation email.
+        /// </summary>
+        /// <param name="model"> RegisterViewModel data properties </param>
+        /// <returns>
+        /// if(registration successful): Views/Account/ResendConfirmationEmail.cshtml
+        /// if(registration failed): either Views/Shared/Error.cshtml or Views/Account/Register.cshtml
+        /// </returns>
         //
         // POST: /Account/Register
         [HttpPost]
@@ -188,6 +224,10 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Gets user resend confirmation email page.
+        /// </summary>
+        /// <returns> Views/Account/ResendConfirmationEmail.cshtml </returns>
         //
         // GET: /Account/ResendConfirmationEmail
         [AllowAnonymous]
@@ -196,6 +236,14 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Resends confirmation email to email passed in model.
+        /// </summary>
+        /// <param name="model"> ResendConfirmationEmailViewModel data propterty (user email address) </param>
+        /// <returns>
+        /// if(successful): execution resumes in link in user's email to Views/Account/UserSetPassword.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         //
         // POST: /Account/ResendConfirmationEmail
         [HttpPost]
@@ -224,6 +272,15 @@ namespace BakerySquared.Controllers
             return View();
         }      
 
+        /// <summary>
+        /// Gets confirm email page.
+        /// </summary>
+        /// <param name="userId"> Id of user in AspNetUsers table of DefaultConnection database </param>
+        /// <param name="code"> email confirmation token </param>
+        /// <returns>
+        /// if(successful): Views/Account/ConfirmEmail.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -237,8 +294,11 @@ namespace BakerySquared.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
-        // 'UserSetPassword' enables the user to set their password immediately after confirming their email
+        /// <summary>
+        /// Gets user set password page.  Execution is sent here from the confirmation email 
+        /// for user to choose password.
+        /// </summary>
+        /// <returns> Views/Account/UserSetPassword.cshtml </returns>
         //
         // GET: /Account/UserSetPassword
         [AllowAnonymous]
@@ -247,6 +307,14 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Resets password to password chosen by user. 
+        /// </summary>
+        /// <param name="model"> UserSetPasswordViewModel data properties </param>
+        /// <returns>
+        /// if(reset successful): Views/Account/Login.cshtml
+        /// if(reset failed): either Views/Shared/Error.cshtml or Views/Account/UserSetPassword.cshtml
+        /// </returns>
         //
         // POST: /Account/UserSetPassword
         [HttpPost]
@@ -277,6 +345,10 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Gets user forgot password page.
+        /// </summary>
+        /// <returns> Views/Account/ForgotPassword.cshtml </returns>
         //
         // GET: /Account/ForgotPassword
         [AllowAnonymous]
@@ -285,6 +357,15 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Sends email for resetting user password to email passed in model.
+        /// </summary>
+        /// <param name="model"> ForgotPasswordViewModel data property (user email address) </param>
+        /// <returns> 
+        /// if(successful): Views/Account/ForgotPasswordConfirmation.cshtml then,
+        ///                 execution resumes in link in user's email to Views/Account/ResetPassword.cshtml
+        /// if(failed): Views/Account/ForgotPassword.cshtml
+        /// </returns>
         //
         // POST: /Account/ForgotPassword
         [HttpPost]
@@ -311,6 +392,10 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Gets forgot password confirmaiton page.
+        /// </summary>
+        /// <returns> Views/Account/ForgotPasswordConfirmation.cshtml </returns>
         //
         // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
@@ -319,6 +404,14 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Gets user reset password page.
+        /// </summary>
+        /// <param name="code"> password reset token </param>
+        /// <returns>
+        /// if(code is valid): Views/Account/ResetPassword.cshtml
+        /// if(code is invalid): Views/Shared/Error.cshtml
+        /// </returns>
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
@@ -327,6 +420,14 @@ namespace BakerySquared.Controllers
             return code == null ? View("Error") : View();
         }
 
+        /// <summary>
+        /// Resets user password.
+        /// </summary>
+        /// <param name="model"> ResetPasswordViewModel data properties </param>
+        /// <returns>
+        /// if(reset successful): ResetPasswordconfirmation action of AccountController.cs
+        /// if(reset failed): Views/Account/ResetPassword.cshtml
+        /// </returns>
         //
         // POST: /Account/ResetPassword
         [HttpPost]
@@ -353,6 +454,11 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Gets reset password confirmation page.  Tells user that the password
+        /// has been reset.
+        /// </summary>
+        /// <returns> Views/Account/ResetPasswordConfirmation.cshtml </returns>
         //
         // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
@@ -475,6 +581,10 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Logs user off.
+        /// </summary>
+        /// <returns> Index action of HomeController.cs </returns>
         //
         // POST: /Account/LogOff
         [HttpPost]
@@ -493,6 +603,10 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Gets registered admins page.  Displays list of all registered admins (users with logins).
+        /// </summary>
+        /// <returns> Views/Account/RegisteredAdmins.cshtml </returns>
         //
         // GET: /Account/RegisteredAdmins
         [AllowAnonymous]
@@ -504,6 +618,11 @@ namespace BakerySquared.Controllers
             return View(admins);
         }
 
+        /// <summary>
+        /// Override to delete instances of _userManager and _signInManager that are done 
+        /// being used.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -582,6 +701,11 @@ namespace BakerySquared.Controllers
             }
         }
 
+        /// <summary>
+        /// Helper to resend confirmation email to an already registered account.
+        /// </summary>
+        /// <param name="userID"> Id of user in AspNetUsers table of DefaultConnection database </param>
+        /// <returns> Url link to ConfirmEmail action of AccountController.cs </returns>
         private async Task<string> SendEmailConfirmationTokenAsync(string userID)
         {
             string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);

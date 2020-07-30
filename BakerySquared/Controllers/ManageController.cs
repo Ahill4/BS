@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Holds all funtionality for users to manage their own account in-app.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -49,7 +59,25 @@ namespace BakerySquared.Controllers
                 _userManager = value;
             }
         }
+        /**********************************************
+        //
+        // ONLY ACTION/TASK<> CURRENTLY IN USE:
+        //
+        // public async Task<ActionResult> Index()
+        // public ActionResult ChangePassword()
+        // public async Task<ActionResult> ChangePassword()
+        //
+        //
+        // Features such as adding phone number can be
+        // implemented but are currently not.
+        //
+        *********************************************/
 
+        /// <summary>
+        /// Gets user manage page.  Used for user to manage their own account info.
+        /// </summary>
+        /// <param name="message"> Message to by displayed at top of page.  Defaulted to empty string. </param>
+        /// <returns> Views/Manage/Index.cshtml </returns>
         //
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
@@ -213,6 +241,10 @@ namespace BakerySquared.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.RemovePhoneSuccess });
         }
 
+        /// <summary>
+        /// Gets change password page.
+        /// </summary>
+        /// <returns> Views/Manage/ChangePassword.cshtml </returns>
         //
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
@@ -220,6 +252,14 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Changes password at the request of the user.
+        /// </summary>
+        /// <param name="model"> ChangePasswordViewModel data properties </param>
+        /// <returns>
+        /// if(successful): Views/Manage/Index.cshtml
+        /// if(failed): Views/Manage/ChangePassword.cshtml
+        /// </returns>
         //
         // POST: /Manage/ChangePassword
         [HttpPost]

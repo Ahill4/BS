@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Configures identity of app users based on classes defined in AspNet.Identity namespace.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -19,6 +29,11 @@ namespace BakerySquared
 {
     public class EmailService : IIdentityMessageService
     {
+        /// <summary>
+        /// Sends email via SendMail() method
+        /// </summary>
+        /// <param name="message"> IdentityMessage object to be configured for email </param>
+        /// <returns></returns>
         public Task SendAsync(IdentityMessage message)
         {            
             return Task.Factory.StartNew(() =>
@@ -27,6 +42,10 @@ namespace BakerySquared
             });
         }
 
+        /// <summary>
+        /// Sends email to user via SMTP
+        /// </summary>
+        /// <param name="message"> IdentityMessage object to be configured for email </param>
         void SendMail(IdentityMessage message)
         {
             var msg = new MailMessage();
