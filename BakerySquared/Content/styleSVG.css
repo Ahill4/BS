@@ -1,18 +1,42 @@
-﻿rect:hover {
-    fill: #ff0000 !important;
+﻿
+/*******************************************************************************
+    * @file
+    * @brief css for the floor views
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/
+
+rect:hover, path:hover {
+    fill: #ff0000;
     cursor: pointer;
 }
+
 .social {
     fill: green;
     fill-opacity: .5;
 }
 
 .meeting {
-    fill: blue;
+    fill: cyan;
     fill-opacity: .5;
 }
 
 .desk {
     fill: yellow;
     fill-opacity: .5;
+}
+
+.enclave {
+    fill: darkblue;
+    fill-opacity: .5;
+}
+
+.mapContainer {
+    width: 1000px;
+    height: 575px;
+    cursor: grab;
+    overflow: auto;
 }

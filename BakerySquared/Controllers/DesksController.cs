@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Controlls all the Desk views and interacts with the database
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -8,7 +18,7 @@ using System.Web;
 using System.Web.Mvc;
 using BSDB.Models;
 
-namespace BSDB.Controllers
+namespace BakerySquared.Controllers
 {
     public class DesksController : Controller
     {
