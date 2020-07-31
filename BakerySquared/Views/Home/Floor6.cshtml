@@ -1,0 +1,37 @@
+﻿@*
+       /*******************************************************************************
+    * @file
+    * @brief View for Floor 6
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/
+*@
+
+@{
+    string floorPath6 = HttpContext.Current.Server.MapPath("~/Views/Floors/Floor6.svg");
+    string floor6 = File.ReadAllText(floorPath6);
+}
+@Scripts.Render("~/bundles/jqueryui")
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="~/Content/styleSVG.css" />
+    <link rel="stylesheet" type="text/css" href="~/Content/jQuery-ui.css" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/scripts/scriptSVG.js"></script>
+</head>
+<body>
+    @{
+        Html.RenderPartial("Forms");
+    }
+    <p>Floor 6</p>
+    <div id="map" class="mapContainer">
+        @Html.Raw(floor6);
+    </div>
+</body>
+</html>

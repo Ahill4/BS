@@ -1,0 +1,32 @@
+﻿@*
+       /*******************************************************************************
+    * @file
+    * @brief shared partial view used for the forms
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/
+*@
+
+<form>
+    <label for="Floors">Choose a floor:</label>
+    <select name="floors" id="floors">
+        <option></option>
+        <option value="1">Floor 1</option>
+        <option value="4">Floor 4</option>
+        <option value="5">Floor 5</option>
+        <option value="6">Floor 6</option>
+        <option value="7">Floor 7</option>
+    </select>
+    <input onclick="setFloor()" type="button" value="Submit" />
+</form>
+
+<form>
+    <input type="text" placeholder="Search.." id="search" />
+    <input type="button" class="btn btn-info" value="Let's Go!" onclick="searchBar()" />
+</form>
+<input onclick="collectDB()" type="button" value="Array" />
+
+<input id="test" min="10" max="25" value='10' step="1" onchange="showVal(this.value)" type="range" />
