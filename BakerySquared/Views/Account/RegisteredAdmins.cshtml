@@ -1,0 +1,40 @@
+﻿@*
+    /*******************************************************************************
+    * @file
+    * @brief Registered Admins list page.
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/
+*@
+
+@model IEnumerable<BakerySquared.Models.ApplicationUser>
+@{
+    ViewBag.Title = "Registered Admins";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table table-bordered table-responsive table-hover">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+    </tr>
+    <tbody>
+        @foreach (var admin in Model)
+        {
+            if (admin.EmailConfirmed)
+            {
+                <tr>
+                    <td>@admin.FirstName &nbsp; @admin.LastName</td>
+                    <td>@admin.Email</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

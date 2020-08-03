@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Manages user interactions with account functions.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -52,8 +62,11 @@ namespace BakerySquared.Controllers
             }
         }
 
-        //
-        // GET: /Account/Login
+        /// <summary>
+        /// Gets user login page.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns> Views/Account/Login.cshtml </returns>
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -61,8 +74,15 @@ namespace BakerySquared.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
+        /// <summary>
+        /// Verifies user login credentials via AspNetUsers table of DefaultConnection database.
+        /// </summary>
+        /// <param name="model"> LoginViewModel data properties </param>
+        /// <param name="returnUrl"></param>
+        /// <returns> 
+        /// if(login success): Views/Home/Index.cshtml 
+        /// if(login failure): either Views/Shared/Error.cshtml or Views/Account/Login.cshtml 
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -74,14 +94,14 @@ namespace BakerySquared.Controllers
             }
 
             // Require the user to have a confirmed email before they can log on.
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
                 if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                 {
                     string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id);
 
-                    ViewBag.errorMessage = "You must have a confirmed email to log on.  A new confirmation email has been sent to you.";
+                    ViewBag.errorMessage = "Email has not been confirmed.  A new confirmation email has been sent to you.";
                     return View("Error");
                 }
             }
@@ -92,20 +112,41 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    { 
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    } 
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    { 
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View();
+                    }
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
+                    {
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                    }                
             }
         }
 
-        //
-        // GET: /Account/VerifyCode
+        /// <summary>
+        /// Checks that user has been verified. Used for verification 
+        /// of two-factor authentication. Two-factor authentication is 
+        /// currently not implemented so this method is not used.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns>
+        /// if(successful): Views/Account/VerifyCode.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
@@ -117,8 +158,16 @@ namespace BakerySquared.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/VerifyCode
+        /// <summary>
+        /// Allows user to verify their account for two-factor aunthentication. 
+        /// Two-factor authentication is currently not implemented so this method 
+        /// is not used.
+        /// </summary>
+        /// <param name="model"> VerifyCodeViewModel data properties </param>
+        /// <returns>
+        /// if(successful): model.ReturnUrl
+        /// if(failed): either Views/Shared/Lockout.cshtml or Views/Account/VerifyCody.cshtml 
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -137,26 +186,43 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
+                    { 
+                        return RedirectToLocal(model.ReturnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View();
+                    }
                 default:
-                    ModelState.AddModelError("", "Invalid code.");
-                    return View(model);
+                    { 
+                        ModelState.AddModelError("", "Invalid code.");
+                        return View(model);
+                    }
             }
         }
 
-        //
-        // GET: /Account/Register
+        /// <summary>
+        /// Gets user registration page.
+        /// </summary>
+        /// <returns> Views/Account/Register.cshtml </returns>
         [AllowAnonymous]
         public ActionResult Register()
         {
             return View();
         }
 
-        //
-        // POST: /Account/Register
+        /// <summary>
+        /// Creates new user and sends confirmation email.
+        /// </summary>
+        /// <param name="model"> RegisterViewModel data properties </param>
+        /// <returns>
+        /// if(registration successful): Views/Account/ResendConfirmationEmail.cshtml
+        /// if(registration failed): either Views/Shared/Error.cshtml or Views/Account/Register.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -164,13 +230,20 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserName = model.Email
+                };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", callbackUrl);
+                    await UserManager.SendEmailAsync(user.Id, "Account Confirmation", callbackUrl);
 
                     return View("ResendConfirmationEmail");
                 }
@@ -181,26 +254,32 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        // ************ Resend confirmation email is work in progress ****************************
-
-        //
-        // GET: /Account/ResendConfirmationEmail
+        /// <summary>
+        /// Gets user resend confirmation email page.
+        /// </summary>
+        /// <returns> Views/Account/ResendConfirmationEmail.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ResendConfirmationEmail()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ResendConfirmationEmail
+        /// <summary>
+        /// Resends confirmation email to email passed in model.
+        /// </summary>
+        /// <param name="model"> ResendConfirmationEmailViewModel data propterty (user email address) </param>
+        /// <returns>
+        /// if(successful): execution resumes in link in user's email to Views/Account/UserSetPassword.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailViewModel model)
         {
             if (ModelState.IsValid)
-            {   
-                var user = await UserManager.FindByNameAsync(model.Email);
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user != null)
                 {
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
@@ -217,12 +296,17 @@ namespace BakerySquared.Controllers
 
             // If we got this far, something failed, redisplay form
             return View();
-        }
+        }      
 
-        // **************************************************************************************
-
-        //
-        // GET: /Account/ConfirmEmail
+        /// <summary>
+        /// Gets confirm email page.
+        /// </summary>
+        /// <param name="userId"> Id of user in AspNetUsers table of DefaultConnection database </param>
+        /// <param name="code"> email confirmation token </param>
+        /// <returns>
+        /// if(successful): Views/Account/ConfirmEmail.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
@@ -234,16 +318,72 @@ namespace BakerySquared.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
-        // GET: /Account/ForgotPassword
+        /// <summary>
+        /// Gets user set password page.  Execution is sent here from the confirmation email 
+        /// for user to choose password.
+        /// </summary>
+        /// <returns> Views/Account/UserSetPassword.cshtml </returns>
+        [AllowAnonymous]
+        public ActionResult UserSetPassword()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Resets password to password chosen by user. 
+        /// </summary>
+        /// <param name="model"> UserSetPasswordViewModel data properties </param>
+        /// <returns>
+        /// if(reset successful): Views/Account/Login.cshtml
+        /// if(reset failed): either Views/Shared/Error.cshtml or Views/Account/UserSetPassword.cshtml
+        /// </returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UserSetPassword(UserSetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("Error");
+                }
+
+                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                model.Code = code;
+                var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        /// <summary>
+        /// Gets user forgot password page.
+        /// </summary>
+        /// <returns> Views/Account/ForgotPassword.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ForgotPassword
+        /// <summary>
+        /// Sends email for resetting user password to email passed in model.
+        /// </summary>
+        /// <param name="model"> ForgotPasswordViewModel data property (user email address) </param>
+        /// <returns> 
+        /// if(successful): Views/Account/ForgotPasswordConfirmation.cshtml then,
+        ///                 execution resumes in link in user's email to Views/Account/ResetPassword.cshtml
+        /// if(failed): Views/Account/ForgotPassword.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -251,7 +391,7 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+                var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -260,7 +400,7 @@ namespace BakerySquared.Controllers
 
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", callbackUrl);
+                await UserManager.SendEmailAsync(user.Id, "Password Reset", callbackUrl);
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
@@ -268,24 +408,38 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Account/ForgotPasswordConfirmation
+        /// <summary>
+        /// Gets forgot password confirmaiton page.
+        /// </summary>
+        /// <returns> Views/Account/ForgotPasswordConfirmation.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // GET: /Account/ResetPassword
+        /// <summary>
+        /// Gets user reset password page.
+        /// </summary>
+        /// <param name="code"> password reset token </param>
+        /// <returns>
+        /// if(code is valid): Views/Account/ResetPassword.cshtml
+        /// if(code is invalid): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
             return code == null ? View("Error") : View();
         }
 
-        //
-        // POST: /Account/ResetPassword
+        /// <summary>
+        /// Resets user password.
+        /// </summary>
+        /// <param name="model"> ResetPasswordViewModel data properties </param>
+        /// <returns>
+        /// if(reset successful): ResetPasswordconfirmation action of AccountController.cs
+        /// if(reset failed): Views/Account/ResetPassword.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -310,16 +464,23 @@ namespace BakerySquared.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/ResetPasswordConfirmation
+        /// <summary>
+        /// Gets reset password confirmation page.  Tells user that the password
+        /// has been reset.
+        /// </summary>
+        /// <returns> Views/Account/ResetPasswordConfirmation.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ExternalLogin
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -329,8 +490,17 @@ namespace BakerySquared.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-        //
-        // GET: /Account/SendCode
+        /// <summary>
+        /// Gets properties to create two-factor authentication code to send user.
+        /// Two-factor authentication is currently not implemented so this method is 
+        /// not used.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns>
+        /// if(successful): Views/Account/SendCode.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
@@ -344,8 +514,16 @@ namespace BakerySquared.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/SendCode
+        /// <summary>
+        /// Sends code for two-factor authentication to user. Two-factor 
+        /// authentication is currently not implemented so this method is 
+        /// not used.
+        /// </summary>
+        /// <param name="model"> SendCodeViewModel data properties </param>
+        /// <returns>
+        /// if(successful): sends execution to VerifyCode action of AccoutController.cs
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -364,8 +542,19 @@ namespace BakerySquared.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
-        //
-        // GET: /Account/ExternalLoginCallback
+        /// <summary>
+        /// Helper to ExternalLoginConfirmation() to log in user via external 
+        /// login provider. External login is currently not implemented so this 
+        /// method is not used.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns>
+        /// if(successful): sends user to returnUrl
+        /// if(failed): Views/Shared/Lockout.cshtml or 
+        ///             Views/Shared/Error.cshtml or
+        ///             Views/Account/ExternalLoginConfirmation.cshtml
+        ///             sends execution to SendCode action in AccountController.cs             
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -380,22 +569,43 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    { 
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    }
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                    {
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View("Error");
+                    }
                 default:
-                    // If the user does not have an account, then prompt the user to create an account
-                    ViewBag.ReturnUrl = returnUrl;
-                    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    {
+                        // If the user does not have an account, then prompt the user to create an account
+                        ViewBag.ReturnUrl = returnUrl;
+                        ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+                        return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    }
             }
         }
 
-        //
-        // POST: /Account/ExternalLoginConfirmation
+        /// <summary>
+        /// Log in user via external login provider. External login is 
+        /// currently not implemented so this method is not used.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns>
+        /// if(successful): redirects user to returnUrl
+        /// if(failed): Views/Account/ExternalLoginConfirmation.cshtml or
+        ///             Views/Account/ExternalLoginFailure.cshtml or
+        ///             redirects execution to Index action in ManageController.cs
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -432,8 +642,10 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/LogOff
+        /// <summary>
+        /// Logs user off.
+        /// </summary>
+        /// <returns> Index action of HomeController.cs </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
@@ -442,14 +654,34 @@ namespace BakerySquared.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
-        // GET: /Account/ExternalLoginFailure
+        /// <summary>
+        /// Gets ExternalLoginFailure page.
+        /// </summary>
+        /// <returns> Views/Account/ExternalLoginFailure.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
             return View();
         }
 
+        /// <summary>
+        /// Gets registered admins page.  Displays list of all registered admins (users with logins).
+        /// </summary>
+        /// <returns> Views/Account/RegisteredAdmins.cshtml </returns>
+        [AllowAnonymous]
+        public ActionResult RegisteredAdmins()
+        {
+            var context = ApplicationDbContext.Create();
+            var admins = context.Users.ToList();
+
+            return View(admins);
+        }
+
+        /// <summary>
+        /// Override to delete instances of _userManager and _signInManager that are done 
+        /// being used.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -528,11 +760,16 @@ namespace BakerySquared.Controllers
             }
         }
 
+        /// <summary>
+        /// Helper to resend confirmation email to an already registered account.
+        /// </summary>
+        /// <param name="userID"> Id of user in AspNetUsers table of DefaultConnection database </param>
+        /// <returns> Url link to ConfirmEmail action of AccountController.cs </returns>
         private async Task<string> SendEmailConfirmationTokenAsync(string userID)
         {
             string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-            await UserManager.SendEmailAsync(userID, "Confirm your account", callbackUrl);
+            await UserManager.SendEmailAsync(userID, "Account Confirmation", callbackUrl);
 
             return callbackUrl;
         }

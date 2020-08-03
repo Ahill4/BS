@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*******************************************************************************
+ * @file
+ * @brief Configures identity of app users based on classes defined in AspNet.Identity namespace.
+ *
+ * *****************************************************************************
+ *   Copyright (c) 2020 Koninklijke Philips N.V.
+ *   All rights are reserved. Reproduction in whole or in part is
+ *   prohibited without the prior written consent of the copyright holder.
+ *******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -19,6 +29,11 @@ namespace BakerySquared
 {
     public class EmailService : IIdentityMessageService
     {
+        /// <summary>
+        /// Sends email via SendMail() method
+        /// </summary>
+        /// <param name="message"> IdentityMessage object to be configured for email </param>
+        /// <returns></returns>
         public Task SendAsync(IdentityMessage message)
         {            
             return Task.Factory.StartNew(() =>
@@ -27,15 +42,33 @@ namespace BakerySquared
             });
         }
 
+        /// <summary>
+        /// Sends email to user via SMTP
+        /// </summary>
+        /// <param name="message"> IdentityMessage object to be configured for email </param>
         void SendMail(IdentityMessage message)
-        {                      
-            string html = " To process your request: <a href=\"" + message.Body + "\"> CLICK HERE </a><br/>\n\n"; 
-
+        {
             var msg = new MailMessage();
             msg.From = new MailAddress("bakerysquared1@gmail.com");
             msg.To.Add(new MailAddress(message.Destination));
             msg.Subject = message.Subject;
-            msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(html, null, MediaTypeNames.Text.Html));
+
+            switch (msg.Subject)
+            {
+                case "Account Confirmation":
+                    {
+                        msg.Body = " To confirm your new Bakery Squared account: <a href=\"" + message.Body + "\"> Confirm Account </a><br/>\n\n";
+                        break;
+                    }
+
+                case "Password Reset":
+                    {
+                        msg.Body = " To reset your password for your Bakery Squared account: <a href=\"" + message.Body + "\"> Reset Password </a><br/>\n\n";
+                        break;
+                    }
+            }
+
+            msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(msg.Body, null, MediaTypeNames.Text.Html));
 
             var smtp = new SmtpClient("smtp.gmail.com", Convert.ToInt32(587));
             System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("bakerysquared1", "123Password");
@@ -46,6 +79,10 @@ namespace BakerySquared
         }
     }
 
+    /// <summary>
+    /// Class reserved for sending SMS messages.  
+    /// Currently not implemented.
+    /// </summary>
     public class SmsService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)
@@ -55,14 +92,27 @@ namespace BakerySquared
         }
     }
 
-    // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
+    /// <summary>
+    /// Configure the application user manager used in this application. UserManager 
+    /// is defined in ASP.NET Identity and is used by the application.
+    /// </summary>
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="store"></param>
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
         {
         }
 
+        /// <summary>
+        /// Creates new ApplicationUserManager object upon login/registration request.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="context"> DB context for storage of user info </param>
+        /// <returns></returns>
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
@@ -111,7 +161,9 @@ namespace BakerySquared
         }
     }
 
-    // Configure the application sign-in manager which is used in this application.
+    /// <summary>
+    /// Configure the application sign-in manager which is used in this application.
+    /// </summary>
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)

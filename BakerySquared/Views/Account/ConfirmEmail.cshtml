@@ -1,10 +1,22 @@
-﻿@{
+﻿@*
+    /*******************************************************************************
+    * @file
+    * @brief Email Confirmation page.
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/
+*@
+
+@{
     ViewBag.Title = "Email Confirmation";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 <div>
     <p>
-        Thank you for confirming your email. Please @Html.ActionLink("Click here to Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+        Thank you for confirming your email. Please @Html.ActionLink("Click here to set password", "UserSetPassword", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
     </p>
 </div>
