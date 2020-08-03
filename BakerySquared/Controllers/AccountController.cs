@@ -67,8 +67,6 @@ namespace BakerySquared.Controllers
         /// </summary>
         /// <param name="returnUrl"></param>
         /// <returns> Views/Account/Login.cshtml </returns>
-        //
-        // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -85,8 +83,6 @@ namespace BakerySquared.Controllers
         /// if(login success): Views/Home/Index.cshtml 
         /// if(login failure): either Views/Shared/Error.cshtml or Views/Account/Login.cshtml 
         /// </returns>
-        //
-        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -116,20 +112,41 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    { 
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    } 
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    { 
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View();
+                    }
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
+                    {
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                    }                
             }
         }
 
-        //
-        // GET: /Account/VerifyCode
+        /// <summary>
+        /// Checks that user has been verified. Used for verification 
+        /// of two-factor authentication. Two-factor authentication is 
+        /// currently not implemented so this method is not used.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns>
+        /// if(successful): Views/Account/VerifyCode.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
@@ -141,8 +158,16 @@ namespace BakerySquared.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/VerifyCode
+        /// <summary>
+        /// Allows user to verify their account for two-factor aunthentication. 
+        /// Two-factor authentication is currently not implemented so this method 
+        /// is not used.
+        /// </summary>
+        /// <param name="model"> VerifyCodeViewModel data properties </param>
+        /// <returns>
+        /// if(successful): model.ReturnUrl
+        /// if(failed): either Views/Shared/Lockout.cshtml or Views/Account/VerifyCody.cshtml 
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -161,13 +186,22 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
+                    { 
+                        return RedirectToLocal(model.ReturnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View();
+                    }
                 default:
-                    ModelState.AddModelError("", "Invalid code.");
-                    return View(model);
+                    { 
+                        ModelState.AddModelError("", "Invalid code.");
+                        return View(model);
+                    }
             }
         }
 
@@ -175,8 +209,6 @@ namespace BakerySquared.Controllers
         /// Gets user registration page.
         /// </summary>
         /// <returns> Views/Account/Register.cshtml </returns>
-        //
-        // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
         {
@@ -191,8 +223,6 @@ namespace BakerySquared.Controllers
         /// if(registration successful): Views/Account/ResendConfirmationEmail.cshtml
         /// if(registration failed): either Views/Shared/Error.cshtml or Views/Account/Register.cshtml
         /// </returns>
-        //
-        // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -228,8 +258,6 @@ namespace BakerySquared.Controllers
         /// Gets user resend confirmation email page.
         /// </summary>
         /// <returns> Views/Account/ResendConfirmationEmail.cshtml </returns>
-        //
-        // GET: /Account/ResendConfirmationEmail
         [AllowAnonymous]
         public ActionResult ResendConfirmationEmail()
         {
@@ -244,8 +272,6 @@ namespace BakerySquared.Controllers
         /// if(successful): execution resumes in link in user's email to Views/Account/UserSetPassword.cshtml
         /// if(failed): Views/Shared/Error.cshtml
         /// </returns>
-        //
-        // POST: /Account/ResendConfirmationEmail
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -281,8 +307,6 @@ namespace BakerySquared.Controllers
         /// if(successful): Views/Account/ConfirmEmail.cshtml
         /// if(failed): Views/Shared/Error.cshtml
         /// </returns>
-        //
-        // GET: /Account/ConfirmEmail
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
@@ -299,8 +323,6 @@ namespace BakerySquared.Controllers
         /// for user to choose password.
         /// </summary>
         /// <returns> Views/Account/UserSetPassword.cshtml </returns>
-        //
-        // GET: /Account/UserSetPassword
         [AllowAnonymous]
         public ActionResult UserSetPassword()
         {
@@ -315,8 +337,6 @@ namespace BakerySquared.Controllers
         /// if(reset successful): Views/Account/Login.cshtml
         /// if(reset failed): either Views/Shared/Error.cshtml or Views/Account/UserSetPassword.cshtml
         /// </returns>
-        //
-        // POST: /Account/UserSetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -349,8 +369,6 @@ namespace BakerySquared.Controllers
         /// Gets user forgot password page.
         /// </summary>
         /// <returns> Views/Account/ForgotPassword.cshtml </returns>
-        //
-        // GET: /Account/ForgotPassword
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
@@ -366,8 +384,6 @@ namespace BakerySquared.Controllers
         ///                 execution resumes in link in user's email to Views/Account/ResetPassword.cshtml
         /// if(failed): Views/Account/ForgotPassword.cshtml
         /// </returns>
-        //
-        // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -396,8 +412,6 @@ namespace BakerySquared.Controllers
         /// Gets forgot password confirmaiton page.
         /// </summary>
         /// <returns> Views/Account/ForgotPasswordConfirmation.cshtml </returns>
-        //
-        // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
@@ -412,8 +426,6 @@ namespace BakerySquared.Controllers
         /// if(code is valid): Views/Account/ResetPassword.cshtml
         /// if(code is invalid): Views/Shared/Error.cshtml
         /// </returns>
-        //
-        // GET: /Account/ResetPassword
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
@@ -428,8 +440,6 @@ namespace BakerySquared.Controllers
         /// if(reset successful): ResetPasswordconfirmation action of AccountController.cs
         /// if(reset failed): Views/Account/ResetPassword.cshtml
         /// </returns>
-        //
-        // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -459,16 +469,18 @@ namespace BakerySquared.Controllers
         /// has been reset.
         /// </summary>
         /// <returns> Views/Account/ResetPasswordConfirmation.cshtml </returns>
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ExternalLogin
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -478,8 +490,17 @@ namespace BakerySquared.Controllers
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
         }
 
-        //
-        // GET: /Account/SendCode
+        /// <summary>
+        /// Gets properties to create two-factor authentication code to send user.
+        /// Two-factor authentication is currently not implemented so this method is 
+        /// not used.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <param name="rememberMe"></param>
+        /// <returns>
+        /// if(successful): Views/Account/SendCode.cshtml
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
@@ -493,8 +514,16 @@ namespace BakerySquared.Controllers
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/SendCode
+        /// <summary>
+        /// Sends code for two-factor authentication to user. Two-factor 
+        /// authentication is currently not implemented so this method is 
+        /// not used.
+        /// </summary>
+        /// <param name="model"> SendCodeViewModel data properties </param>
+        /// <returns>
+        /// if(successful): sends execution to VerifyCode action of AccoutController.cs
+        /// if(failed): Views/Shared/Error.cshtml
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -513,8 +542,19 @@ namespace BakerySquared.Controllers
             return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
-        //
-        // GET: /Account/ExternalLoginCallback
+        /// <summary>
+        /// Helper to ExternalLoginConfirmation() to log in user via external 
+        /// login provider. External login is currently not implemented so this 
+        /// method is not used.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns>
+        /// if(successful): sends user to returnUrl
+        /// if(failed): Views/Shared/Lockout.cshtml or 
+        ///             Views/Shared/Error.cshtml or
+        ///             Views/Account/ExternalLoginConfirmation.cshtml
+        ///             sends execution to SendCode action in AccountController.cs             
+        /// </returns>
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -529,22 +569,43 @@ namespace BakerySquared.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    { 
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
-                    return View("Lockout");
+                    { 
+                        return View("Lockout");
+                    }
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                    {
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                    }
                 case SignInStatus.Failure:
+                    {
+                        return View("Error");
+                    }
                 default:
-                    // If the user does not have an account, then prompt the user to create an account
-                    ViewBag.ReturnUrl = returnUrl;
-                    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    {
+                        // If the user does not have an account, then prompt the user to create an account
+                        ViewBag.ReturnUrl = returnUrl;
+                        ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+                        return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    }
             }
         }
 
-        //
-        // POST: /Account/ExternalLoginConfirmation
+        /// <summary>
+        /// Log in user via external login provider. External login is 
+        /// currently not implemented so this method is not used.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns>
+        /// if(successful): redirects user to returnUrl
+        /// if(failed): Views/Account/ExternalLoginConfirmation.cshtml or
+        ///             Views/Account/ExternalLoginFailure.cshtml or
+        ///             redirects execution to Index action in ManageController.cs
+        /// </returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -585,8 +646,6 @@ namespace BakerySquared.Controllers
         /// Logs user off.
         /// </summary>
         /// <returns> Index action of HomeController.cs </returns>
-        //
-        // POST: /Account/LogOff
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
@@ -595,8 +654,10 @@ namespace BakerySquared.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //
-        // GET: /Account/ExternalLoginFailure
+        /// <summary>
+        /// Gets ExternalLoginFailure page.
+        /// </summary>
+        /// <returns> Views/Account/ExternalLoginFailure.cshtml </returns>
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
@@ -607,8 +668,6 @@ namespace BakerySquared.Controllers
         /// Gets registered admins page.  Displays list of all registered admins (users with logins).
         /// </summary>
         /// <returns> Views/Account/RegisteredAdmins.cshtml </returns>
-        //
-        // GET: /Account/RegisteredAdmins
         [AllowAnonymous]
         public ActionResult RegisteredAdmins()
         {

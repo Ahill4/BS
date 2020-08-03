@@ -56,12 +56,16 @@ namespace BakerySquared
             switch (msg.Subject)
             {
                 case "Account Confirmation":
-                    msg.Body = " To confirm your new Bakery Squared account: <a href=\"" + message.Body + "\"> Confirm Account </a><br/>\n\n";
-                    break;
+                    {
+                        msg.Body = " To confirm your new Bakery Squared account: <a href=\"" + message.Body + "\"> Confirm Account </a><br/>\n\n";
+                        break;
+                    }
 
                 case "Password Reset":
-                    msg.Body = " To reset your password for your Bakery Squared account: <a href=\"" + message.Body + "\"> Reset Password </a><br/>\n\n";
-                    break;
+                    {
+                        msg.Body = " To reset your password for your Bakery Squared account: <a href=\"" + message.Body + "\"> Reset Password </a><br/>\n\n";
+                        break;
+                    }
             }
 
             msg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(msg.Body, null, MediaTypeNames.Text.Html));
@@ -75,6 +79,10 @@ namespace BakerySquared
         }
     }
 
+    /// <summary>
+    /// Class reserved for sending SMS messages.  
+    /// Currently not implemented.
+    /// </summary>
     public class SmsService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)
@@ -84,14 +92,27 @@ namespace BakerySquared
         }
     }
 
-    // Configure the application user manager used in this application. UserManager is defined in ASP.NET Identity and is used by the application.
+    /// <summary>
+    /// Configure the application user manager used in this application. UserManager 
+    /// is defined in ASP.NET Identity and is used by the application.
+    /// </summary>
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="store"></param>
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
         {
         }
 
+        /// <summary>
+        /// Creates new ApplicationUserManager object upon login/registration request.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="context"> DB context for storage of user info </param>
+        /// <returns></returns>
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
         {
             var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(context.Get<ApplicationDbContext>()));
@@ -140,7 +161,9 @@ namespace BakerySquared
         }
     }
 
-    // Configure the application sign-in manager which is used in this application.
+    /// <summary>
+    /// Configure the application sign-in manager which is used in this application.
+    /// </summary>
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)

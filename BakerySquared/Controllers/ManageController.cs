@@ -59,6 +59,7 @@ namespace BakerySquared.Controllers
                 _userManager = value;
             }
         }
+
         /**********************************************
         //
         // ONLY ACTION/TASK<> CURRENTLY IN USE:
@@ -69,7 +70,9 @@ namespace BakerySquared.Controllers
         //
         //
         // Features such as adding phone number can be
-        // implemented but are currently not.
+        // implemented but are currently not. These features
+        // are commented out of views making them inaccessible
+        // to users.
         //
         *********************************************/
 
@@ -103,8 +106,13 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Manage/RemoveLogin
+        /// <summary>
+        /// Allows user to remove login from AspNetUsers table of DefaultConnection 
+        /// database. Currently not implemented.
+        /// </summary>
+        /// <param name="loginProvider"></param>
+        /// <param name="providerKey"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemoveLogin(string loginProvider, string providerKey)
@@ -127,15 +135,22 @@ namespace BakerySquared.Controllers
             return RedirectToAction("ManageLogins", new { Message = message });
         }
 
-        //
-        // GET: /Manage/AddPhoneNumber
+        /// <summary>
+        /// Allows user to add phone number to their login information in 
+        /// AspNetUsers table of DefaultConnection database. Currently not
+        /// implemented.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult AddPhoneNumber()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/AddPhoneNumber
+        /// <summary>
+        /// Prepares to verify phone number provided by user. Currently not implemented.
+        /// </summary>
+        /// <param name="model"> AddPhoneNumberViewModel data properties </param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddPhoneNumber(AddPhoneNumberViewModel model)
@@ -158,8 +173,10 @@ namespace BakerySquared.Controllers
             return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
         }
 
-        //
-        // POST: /Manage/EnableTwoFactorAuthentication
+        /// <summary>
+        /// Enables two-factor authentication for user login. Currently not implemented.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnableTwoFactorAuthentication()
@@ -173,8 +190,10 @@ namespace BakerySquared.Controllers
             return RedirectToAction("Index", "Manage");
         }
 
-        //
-        // POST: /Manage/DisableTwoFactorAuthentication
+        /// <summary>
+        /// Disables two-factor authentication for user login. Currently not implemented.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DisableTwoFactorAuthentication()
@@ -188,8 +207,13 @@ namespace BakerySquared.Controllers
             return RedirectToAction("Index", "Manage");
         }
 
-        //
-        // GET: /Manage/VerifyPhoneNumber
+        /// <summary>
+        /// Sends SMS to verify phone number after user provided phone number to
+        /// be added to their info in AspNetUsers table of DefaultConnection database.
+        /// Currently not implemented.
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
         public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
         {
             var code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), phoneNumber);
@@ -197,8 +221,12 @@ namespace BakerySquared.Controllers
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
 
-        //
-        // POST: /Manage/VerifyPhoneNumber
+        /// <summary>
+        /// If phone number is verified by user, it is added to their info in 
+        /// AspNetUsers table of DefaultConnection database. Currently not implemented.
+        /// </summary>
+        /// <param name="model"> VerifyPhoneNumberViewModel data properties </param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
@@ -222,8 +250,11 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Manage/RemovePhoneNumber
+        /// <summary>
+        /// Allows user to remove phone number from login information in AspNetUsers
+        /// table of DefaultConnection database. Currently not implemented.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> RemovePhoneNumber()
@@ -245,8 +276,6 @@ namespace BakerySquared.Controllers
         /// Gets change password page.
         /// </summary>
         /// <returns> Views/Manage/ChangePassword.cshtml </returns>
-        //
-        // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
             return View();
@@ -260,8 +289,6 @@ namespace BakerySquared.Controllers
         /// if(successful): Views/Manage/Index.cshtml
         /// if(failed): Views/Manage/ChangePassword.cshtml
         /// </returns>
-        //
-        // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -284,15 +311,22 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Manage/SetPassword
+        /// <summary>
+        /// Allows user to set password. Currently not implemented. User sets password upon 
+        /// email confirmation through actions in AccountController.cs.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult SetPassword()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/SetPassword
+        /// <summary>
+        /// Adds password to AspNetUsers table of DefaultConnection database. Currently
+        /// not implemented.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SetPassword(SetPasswordViewModel model)
@@ -316,8 +350,12 @@ namespace BakerySquared.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Manage/ManageLogins
+        /// <summary>
+        /// Allows user to manage their external logins. External login is not currently
+        /// implemented so this is not used.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task<ActionResult> ManageLogins(ManageMessageId? message)
         {
             ViewBag.StatusMessage =
@@ -339,8 +377,12 @@ namespace BakerySquared.Controllers
             });
         }
 
-        //
-        // POST: /Manage/LinkLogin
+        /// <summary>
+        /// Helper for setting up external login. External login is not currently 
+        /// implemented so this is not used.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LinkLogin(string provider)
@@ -349,8 +391,11 @@ namespace BakerySquared.Controllers
             return new AccountController.ChallengeResult(provider, Url.Action("LinkLoginCallback", "Manage"), User.Identity.GetUserId());
         }
 
-        //
-        // GET: /Manage/LinkLoginCallback
+        /// <summary>
+        /// Helper for setting up external login. External login is not currently
+        /// implemented so this is not used.
+        /// </summary>
+        /// <returns></returns>
         public async Task<ActionResult> LinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
