@@ -127,9 +127,19 @@ function setFill(currentID) {
  * Called when making a call to the controller sends an alert if controller responds with Json
  */
 function ajaxCall(ID) {
+    //checks if default page or regular floor page so that it can route to the right controller method
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/GetController';
+    }
+    else {
+        urlPath = 'GetController'
+    }
+
     $.ajax({
         type: "GET",
-        url: 'GetController',
+        url: urlPath,
         data: {
             id: ID
         },
