@@ -111,30 +111,6 @@ function GetController() {
 }
 
 /*
- * Function searchBar:
- * 
- * Function is called when the submit button on the search bar is hit. used for routing to new floor if necessary
- * if not necessary to go to new floor it
- */
-function searchBar() {
-    //get value entered in the search bar
-    var searchedVal = document.getElementById("search").value;
-
-    //check it to make sure it is proper format ID
-    if (reD.test(searchedVal)) {
-
-        //compare the floor value from the id to current floor and if not equal redirect to proper floor
-        if (searchedVal[1] != currentFloor) {
-            window.location.href = '/Home/Floor' + searchedVal[1] + "?ID=" + searchedVal;
-        }
-        else if (searchedVal[1] == currentFloor) {
-            setFill(searchedVal);
-            ajaxCall(searchedVal);
-        }
-    }
-};
-
-/*
  * Function setFill
  * 
  * Function is called to restore the last ID to its proper fill and set the fill of the new object to the red shown when clicked
