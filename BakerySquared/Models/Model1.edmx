@@ -37,7 +37,7 @@
           <Key>
             <PropertyRef Name="Desk_Id" />
           </Key>
-          <Property Name="Desk_Id" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Desk_Id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Occupant" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Employee">
