@@ -23,6 +23,8 @@ namespace BakerySquared.Controllers
     /// </summary>
     public class HomeController : Controller
     {
+        private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
+
         /// <summary>
         /// Displays Index page
         /// </summary>
@@ -106,7 +108,10 @@ namespace BakerySquared.Controllers
         [HttpGet]
         public ActionResult GetController(String id)
         {
-            String userId = id + " hello";
+            //var employees = from e in db.Employees select e;
+            Employee e = db.Employees.Find(id);
+            //employees = employees.Where(e => e.Desk.Contains(id));
+            String userId = id+ e.ToString();
             return Json(userId, JsonRequestBehavior.AllowGet);
         }
 
