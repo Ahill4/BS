@@ -209,9 +209,19 @@ function collectDB() {
 }
 
 function fillDB() {
+    //checks if default page or regular floor page so that it can route to the right controller method
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/refillDB';
+    }
+    else {
+        urlPath = 'refillDB'
+    }
+
     $.ajax({
         type: "GET",
-        url: 'refillDB',
+        url: urlPath,
         data: {
             floor: currentFloor
         },
