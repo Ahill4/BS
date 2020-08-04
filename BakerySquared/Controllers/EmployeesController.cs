@@ -14,6 +14,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using BSDB.Models;
@@ -170,6 +171,29 @@ namespace BSDB.Controllers
             }
             
             return result;
+        }
+
+        /// <summary>
+        /// If the desk assigned to a user matches the appropriate format for a desk then it will route to the 
+        /// proper floor and highlight the desk
+        /// </summary>
+        /// <param name="desk"> the desk assigned to the user that is being found</param>
+        /// <returns>url that directs to the proper floor or current page if not right format</returns>
+        public ActionResult Find(string desk)
+        {
+            Regex rx = new Regex("^(M|D|S)[0-9]{4}$",
+                   RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            string url = this.Request.UrlReferrer.AbsolutePath; 
+
+            Match match = rx.Match(desk);
+            if (match.Success)
+            {
+                char floor = desk[1];
+                url = "../Home/Floor" + floor + "?ID=" + desk;
+               
+            }
+
+            return Redirect(url);
         }
 
         /// <summary>
