@@ -263,11 +263,6 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\scriptSVG.js" />
-    <Content Include="Views\Home\html.txt" />
-    <Content Include="Views\Home\moved.txt" />
-    <Content Include="Views\Home\svg.html" />
-    <Content Include="Views\Home\testing.html" />
-    <Content Include="Views\Home\TestSVG.svg" />
     <Content Include="Views\Floors\Floor1.svg" />
     <Content Include="Views\Floors\Floor4.svg" />
     <Content Include="Views\Floors\Floor5.svg" />
