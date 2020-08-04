@@ -104,15 +104,34 @@ namespace BakerySquared.Controllers
         /// takes the id sent from the client after user click and uses it to search the db
         /// </summary>
         /// <param name="id">id of the element that was clicked by user</param>
-        /// <returns>returns Json string containing id and hello, temp</returns>
+        /// <returns>returns Json string containing information for space</returns>
         [HttpGet]
         public ActionResult GetController(String id)
         {
-            //var employees = from e in db.Employees select e;
-            Employee e = db.Employees.Find(id);
-            //employees = employees.Where(e => e.Desk.Contains(id));
-            String userId = id+ e.ToString();
-            return Json(userId, JsonRequestBehavior.AllowGet);
+            string returnString = null;
+            var employees = from e in db.Employees select e;
+
+            employees = employees.Where(e => e.Desk.Contains(id));
+
+            employees.ToList();
+
+            foreach (Employee e in employees)
+            {
+               string userId = e.Id + "\n";
+                string userTitle = e.Title + "\n";
+                string userPhone = e.Phone + "\n";
+                string userDesk = e.Desk + "\n";
+                string userEmail = e.Email + "\n";
+                string userManager = e.Manager + "\n";
+                returnString = "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: " + userDesk + "Email: "
+                    + userEmail + "Manager: " + userManager;
+            }
+
+        if(returnString==null)
+            {
+                returnString = "Not Occupied";
+            }
+            return Json(returnString, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
