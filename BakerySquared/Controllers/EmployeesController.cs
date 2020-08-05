@@ -287,9 +287,7 @@ namespace BSDB.Controllers
             {
                 char floor = desk[1];
                 url = "../Home/Floor" + floor + "?ID=" + desk;
-               
             }
-
             return Redirect(url);
         }
 
