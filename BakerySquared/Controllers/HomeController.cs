@@ -87,14 +87,15 @@ namespace BakerySquared.Controllers
 
             foreach (Employee e in employees)
             {
+                string userName = e.Name + "\n";
                string userId = e.Id + "\n";
                 string userTitle = e.Title + "\n";
                 string userPhone = e.Phone + "\n";
                 string userDesk = e.Desk + "\n";
                 string userEmail = e.Email + "\n";
                 string userManager = e.Manager + "\n";
-                returnString = "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: " + userDesk + "Email: "
-                    + userEmail + "Manager: " + userManager;
+                returnString = "Name: " + userName+ "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: " 
+                    + userDesk + "Email: " + userEmail + "Manager: " + userManager;
             }
 
         if(returnString==null)
