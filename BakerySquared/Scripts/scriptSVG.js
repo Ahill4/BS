@@ -33,7 +33,9 @@ var reD = /(D|M|S)[0-9]{4}/
 $(document).ready(function () {
     const path = window.location.pathname;
     currentFloor = path[path.length - 1];
-
+    if (currentFloor == "/") {
+        currentFloor = "1";
+    }
     $("*").each(function () {
         if (reD.test(this.id)) {
             $("#" + this.id).on("click", GetController);
@@ -218,7 +220,6 @@ function fillDB() {
     else {
         urlPath = 'refillDB'
     }
-
     $.ajax({
         type: "GET",
         url: urlPath,
