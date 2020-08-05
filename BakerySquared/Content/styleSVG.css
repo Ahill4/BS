@@ -10,7 +10,7 @@
     *******************************************************************************/
 
 rect:hover, path:hover {
-    fill: #ff0000;
+    fill: #ff0000 !important;
     cursor: pointer;
 }
 
@@ -39,4 +39,5 @@ rect:hover, path:hover {
     height: 575px;
     cursor: grab;
     overflow: auto;
+    overflow: hidden;
 }

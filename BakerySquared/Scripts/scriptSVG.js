@@ -148,7 +148,23 @@ function ajaxCall(ID) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
-            alert(result)
+            if (result == "True") {
+                var add = confirm("Assign someone to this desk?");
+                if (add) {
+                    var name = prompt("Name");
+                    var userId = prompt("Id");
+                    var title = prompt("Title");
+                    var phone = prompt("Phone");
+                    var email = prompt("Email");
+                    var manager = prompt("Manager");
+                    if (userId) {
+                        deskFill(name, ID, userId, title, phone, email, manager);
+                    }
+                }
+            }
+            else {
+                alert(result);
+            }
         },
         error: function (response) {
             alert('error');
@@ -199,17 +215,12 @@ function showVal(a) {
     setZoom(zoomScale, document.getElementsByClassName('mapContainer')[0])
 }
 
-function collectDB() {
-    var locations = [];
-    $("*").each(function () {
-        if (reD.test(this.id)) {
-            locations.push(this.id);
-        }
-    });
-    console.log(locations);
-    fillDB();
-}
-
+/*
+ * Function fillDB
+ *
+ * function called from view to repopulate Db with all the locations from the current floor to 
+ * be used after a floor plan change
+ */
 function fillDB() {
     //checks if default page or regular floor page so that it can route to the right controller method
     let urlPath;
@@ -225,6 +236,45 @@ function fillDB() {
         url: urlPath,
         data: {
             floor: currentFloor
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            alert(result)
+        },
+        error: function (response) {
+            alert("error");
+        }
+    });
+}
+
+/*
+ * Function deskFill
+ *
+ * function called when an registered user desires to fill a desk they clicked in view. 
+ * uses information provided by user to add a user to DB and assign them to the desk
+ */
+function deskFill(name, ID, userId, title, phone, email, manager) {
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/deskFill';
+    }
+    else {
+        urlPath = 'deskFill'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {
+            name: name,
+            id: ID,
+            userId: userId,
+            title: title,
+            phone: phone,
+            email: email,
+            manager: manager
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",
