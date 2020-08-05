@@ -122,7 +122,7 @@ namespace BakerySquared.Controllers
         foreach(Desk e in desks)
             {
                 string id = e.Desk_Id;
-                if (id.Length ==5 && id[1] == floor[0])
+                if (id.Length == 5 && id[1] == floor[0])
                 {
                     db.Desks.Remove(e);
                 }
@@ -131,9 +131,12 @@ namespace BakerySquared.Controllers
             string[] locations = ids.Split(' ');
             foreach(string d in locations)
             {
-                Desk toAdd = new Desk();
-                toAdd.Desk_Id = d;
-                db.Desks.Add(toAdd);
+                if(d.Length == 5)
+                {
+                    Desk toAdd = new Desk();
+                    toAdd.Desk_Id = d;
+                    db.Desks.Add(toAdd);
+                }
             }
             db.SaveChanges();
             return Json("Completed ", JsonRequestBehavior.AllowGet);
