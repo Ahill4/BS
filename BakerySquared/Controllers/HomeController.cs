@@ -24,36 +24,6 @@ namespace BakerySquared.Controllers
     public class HomeController : Controller
     {
         /// <summary>
-        /// Displays Index page
-        /// </summary>
-        /// <returns> view containing index data</returns>
-        public ActionResult Index()
-        {
-            return View();
-        }
-        /// <summary>
-        /// Displays about page
-        /// </summary>
-        /// <returns> view containing about data</returns>
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        /// <summary>
-        /// Displays contact page
-        /// </summary>
-        /// <returns> view containing contact data</returns>
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-
-        /// <summary>
         /// Displays Floor page
         /// </summary>
         /// <returns> view containing floor data</returns>
