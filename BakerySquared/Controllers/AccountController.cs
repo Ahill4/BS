@@ -651,7 +651,7 @@ namespace BakerySquared.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Floor1", "Home");
         }
 
         /// <summary>
@@ -728,7 +728,7 @@ namespace BakerySquared.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Floor1", "Home");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult
