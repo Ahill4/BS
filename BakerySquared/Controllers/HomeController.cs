@@ -112,12 +112,30 @@ namespace BakerySquared.Controllers
         /// to update db</param>
         /// <returns>returns json string to client containing all floor location ids</returns>
         [HttpGet]
-        public ActionResult refillDB(String floor)
+        public ActionResult refillDB(string floor)
         {
+            var desks = from e in db.Desks select e;
+
+            desks = desks.Where(e => e.Desk_Id.Contains(floor));
+
+        foreach(Desk e in desks)
+            {
+                string id = e.Desk_Id;
+                if (id.Length ==5 && id[1] == floor[0])
+                {
+                    db.Desks.Remove(e);
+                }
+            }
             string ids = FileRegex(floor);
             string[] locations = ids.Split(' ');
-            
-            return Json("Completed "+locations, JsonRequestBehavior.AllowGet);
+            foreach(string d in locations)
+            {
+                Desk toAdd = new Desk();
+                toAdd.Desk_Id = d;
+                db.Desks.Add(toAdd);
+            }
+            db.SaveChanges();
+            return Json("Completed ", JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
