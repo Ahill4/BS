@@ -17,8 +17,11 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.WebPages;
+using BakerySquared.Controllers;
 using BSDB.Models;
 using Microsoft.Ajax.Utilities;
+using PagedList;
 
 namespace BSDB.Controllers
 {
@@ -35,17 +38,35 @@ namespace BSDB.Controllers
         /// <param name="sortOrder"></param>
         /// <param name="searchString"></param>
         /// <returns></returns>
-        public ActionResult Index(string sortOrder, string searchString)
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
+            ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.EmailSortParm = sortOrder == "email" ? "email_desc" : "email";
+            ViewBag.PhoneSortParm = sortOrder == "phone" ? "phone_desc" : "phone";
+            ViewBag.DeskSortParm = sortOrder == "desk" ? "desk_desc" : "desk";
+            ViewBag.MngrSortParm = sortOrder == "mngr" ? "mngr_desc" : "mngr";
+            ViewBag.TitleSortParm = sortOrder == "title" ? "title_desc" : "title";
+            ViewBag.IdSortParm = sortOrder == "id" ? "id_desc" : "id";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
 
             var employees = from e in db.Employees select e;
 
             if (!String.IsNullOrEmpty(searchString))
             {
                 employees = employees.Where(e => e.Name.Contains(searchString) || e.Email.Contains(searchString) || 
-                e.Phone.Contains(searchString) || e.Email.Contains(searchString) || e.Desk.Contains(searchString) || 
-                e.Manager.Contains(searchString) || e.Id.Contains(searchString) || e.Title.Contains(searchString));
+                e.Phone.Contains(searchString) || e.Desk.Contains(searchString) || e.Manager.Contains(searchString) ||
+                e.Id.Contains(searchString) || e.Title.Contains(searchString));
             }
 
             switch (sortOrder)
@@ -55,13 +76,77 @@ namespace BSDB.Controllers
                         employees = employees.OrderByDescending(e => e.Name);
                         break;
                     }
+                case "desk_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Desk);
+                        break;
+                    }
+                case "desk":
+                    {
+                        employees = employees.OrderBy(e => e.Desk);
+                        break;
+                    }
+                case "mngr_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Manager);
+                        break;
+                    }
+                case "mngr":
+                    {
+                        employees = employees.OrderBy(e => e.Manager);
+                        break;
+                    }
+                case "title_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Title);
+                        break;
+                    }
+                case "title":
+                    {
+                        employees = employees.OrderBy(e => e.Title);
+                        break;
+                    }
+                case "id_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Id);
+                        break;
+                    }
+                case "id":
+                    {
+                        employees = employees.OrderBy(e => e.Id);
+                        break;
+                    }
+                case "phone_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Phone);
+                        break;
+                    }
+                case "phone":
+                    {
+                        employees = employees.OrderBy(e => e.Phone);
+                        break;
+                    }
+                case "email_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Email);
+                        break;
+                    }
+                case "email":
+                    {
+                        employees = employees.OrderBy(e => e.Email);
+                        break;
+                    }
                 default:
                     {
                         employees = employees.OrderBy(e => e.Name);
                         break;
                     }
             }
-            return View(employees.ToList());
+
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return View(employees.ToPagedList(pageNumber, pageSize));
+            //return View(employees.ToList());
         }
 
         /// <summary>
@@ -109,32 +194,44 @@ namespace BSDB.Controllers
         {
             ActionResult result = null;
             Boolean deskFound = false;
-            Boolean deskEmpty = false;
-            
-            Desk d = db.Desks.Find(employee.Desk);
-            if (d == null)
+            Boolean deskEmpty = true;
+
+            Desk d = new Desk();
+
+            if (employee.Desk.IsNullOrWhiteSpace())
             {
-                ViewBag.message = "Desk not found.";
+                deskFound = true;
             }
             else
             {
-                deskFound = true;
+                d = db.Desks.Find(employee.Desk);
 
-                if (d.Occupant.IsNullOrWhiteSpace())
+                if (d == null)
                 {
-                    deskEmpty = true;
+                    ViewBag.message = "Desk not found.";
                 }
                 else
                 {
-                    ViewBag.message = "This desk is already occupied by " + d.Occupant;
+                    deskFound = true;
+
+                    if (!d.Occupant.IsNullOrWhiteSpace())
+                    {
+                        deskEmpty = false;
+                        ViewBag.message = "This desk is already occupied by " + d.Occupant;
+                    }
                 }
             }
-
+            
             if (ModelState.IsValid && deskFound == true && deskEmpty == true)
             {
                 db.Employees.Add(employee);
+                db.Desks.Remove(d);
+                db.SaveChanges();
+                d.Occupant = employee.Name;
+                db.Desks.Add(d);
                 db.SaveChanges();
                 result = RedirectToAction("Index");
+
             }
             else
             {
