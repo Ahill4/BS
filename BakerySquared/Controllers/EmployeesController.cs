@@ -143,7 +143,7 @@ namespace BSDB.Controllers
                     }
             }
 
-            int pageSize = 3;
+            int pageSize = 25;
             int pageNumber = (page ?? 1);
             return View(employees.ToPagedList(pageNumber, pageSize));
             //return View(employees.ToList());
