@@ -2,38 +2,57 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Data.Entity;
 using BSDB.Models;
 
 namespace BakerySquared.Models
 {
-    public class EFDesksRepository //: IDesksRepository
+    public class EFDesksRepository : IDesksRepository
     {
-        private BakerySquareDirectoryEntities _dbContext = new BakerySquareDirectoryEntities();
+        private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
 
-        //Desk CreateDesk(Desk desk)
-        //{
+        public bool AlreadyExists(Desk desk)
+        {
+            Desk deskTest = db.Desks.Find(desk.Desk_Id);
 
-        //}
+            if (deskTest == null)
+            {
+                return false;
+            }
 
-        //Desk EditDesk(string Id)
-        //{
+            return true;
+        }
 
-        //}
+        public void Create(Desk desk)
+        {            
+            db.Desks.Add(desk);
+            db.SaveChanges();
+        }
 
-        //Desk FindDesk(string Id)
-        //{
+        public void Edit(Desk desk)
+        {
+            db.Entry(desk).State = EntityState.Modified;
+            db.SaveChanges();
+        }
 
-        //}
+        public Desk Find(string Id)
+        {
+            Desk desk = db.Desks.Find(Id);
 
-        //Desk DeleteDesk(string Id)
-        //{
+            return (desk);
+        }
 
-        //}
+        public void Delete(string Id)
+        {
+            Desk desk = db.Desks.Find(Id);
+            db.Desks.Remove(desk);
+            db.SaveChanges();
+        }
 
-        //IEnumerable<Desk> ToList()
-        //{
-
-        //}
+        public IEnumerable<Desk> ToList()
+        {
+            return db.Desks.ToList();
+        }
 
     }
 }

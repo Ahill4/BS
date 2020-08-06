@@ -8,26 +8,32 @@
  *   prohibited without the prior written consent of the copyright holder.
  *******************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
+using BakerySquared.Models;
 using BSDB.Models;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Mvc;
 
 namespace BakerySquared.Controllers
 {
     public class DesksController : Controller
     {
         private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
+        private IDesksRepository _repository;
+
+        public DesksController()
+        {
+            this._repository = new EFDesksRepository();
+        }
+
 
         // GET: Desks
         public ActionResult Index()
         {
-            return View(db.Desks.ToList());
+            //IEnumerable<Desk> deskList = db.Desks.ToList();
+            IEnumerable<Desk> deskList = _repository.ToList();
+
+            return View(deskList);
         }
 
         // GET: Desks/Details/5
@@ -37,7 +43,10 @@ namespace BakerySquared.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Desk desk = db.Desks.Find(id);
+
+            //Desk desk = db.Desks.Find(id);
+            Desk desk = _repository.Find(id);
+
             if (desk == null)
             {
                 return HttpNotFound();
@@ -60,9 +69,20 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Desks.Add(desk);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                //db.Desks.Add(desk);
+                //db.SaveChanges();
+
+                if(!_repository.AlreadyExists(desk))
+                {
+                    _repository.Create(desk);
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Desk already exists.");
+                    return View(desk);
+                }
+
             }
 
             return View(desk);
@@ -75,7 +95,10 @@ namespace BakerySquared.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Desk desk = db.Desks.Find(id);
+
+            //Desk desk = db.Desks.Find(id);
+            Desk desk = _repository.Find(id);
+
             if (desk == null)
             {
                 return HttpNotFound();
@@ -92,8 +115,10 @@ namespace BakerySquared.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(desk).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(desk).State = EntityState.Modified;
+                //db.SaveChanges();
+                _repository.Edit(desk);
+
                 return RedirectToAction("Index");
             }
             return View(desk);
@@ -106,7 +131,10 @@ namespace BakerySquared.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Desk desk = db.Desks.Find(id);
+
+            //Desk desk = db.Desks.Find(id);
+            Desk desk = _repository.Find(id);
+
             if (desk == null)
             {
                 return HttpNotFound();
@@ -119,9 +147,11 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string id)
         {
-            Desk desk = db.Desks.Find(id);
-            db.Desks.Remove(desk);
-            db.SaveChanges();
+            //Desk desk = db.Desks.Find(id);
+            //db.Desks.Remove(desk);
+            //db.SaveChanges();
+            _repository.Delete(id);
+
             return RedirectToAction("Index");
         }
 

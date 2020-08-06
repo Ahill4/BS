@@ -8,13 +8,15 @@ namespace BakerySquared.Models
 {
     public interface IDesksRepository
     {
-        Desk CreateDesk(Desk desk);
+        bool AlreadyExists(Desk desk);
 
-        Desk EditDesk(string Id);
+        void Create(Desk desk);
 
-        Desk FindDesk(string Id);
+        void Edit(Desk desk);
 
-        Desk DeleteDesk(string Id);
+        Desk Find(string Id);
+
+        void Delete(string Id);
 
         IEnumerable<Desk> ToList();
     }

@@ -675,8 +675,7 @@ namespace BakerySquared.Controllers
         {
             //var context = ApplicationDbContext.Create();
             //var admins = context.Users.ToList();
-
-            var admins = _repository.ListUsers();
+            var admins = _repository.ToList();
 
             return View(admins);
         }
