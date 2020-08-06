@@ -38,6 +38,7 @@ $(document).ready(function () {
     }
     $("*").each(function () {
         if (reD.test(this.id)) {
+            isOccupied(this.id);
             $("#" + this.id).on("click", GetController);
         }
     });
@@ -279,6 +280,43 @@ function deskFill(ID, userId) {
         },
         error: function (response) {
             alert("error");
+        }
+    });
+}
+
+/*
+ * Function isOccupied
+ *
+ * function called on every location to check in the desk DB if the desk has an occupant. If so it
+ * adds a css class to the element that changes its color to purple to indicate that the desk is occupied
+ */
+function isOccupied(id){
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/isOccupied';
+    }
+    else {
+        urlPath = 'isOccupied'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {
+            id: id
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            if (result == "Occupied") {
+                var v = document.getElementById(id);
+                console.log(v);
+                v.classList.add("occupied");
+            }
+        },
+        error: function (response) {
+            alert("Cannot determine Occupancy");
         }
     });
 }

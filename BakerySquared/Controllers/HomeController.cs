@@ -153,7 +153,7 @@ namespace BakerySquared.Controllers
                 }
             }
             db.SaveChanges();
-            return Json("Completed ", JsonRequestBehavior.AllowGet);
+            return Json("Completed", JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -191,6 +191,31 @@ namespace BakerySquared.Controllers
         }
 
         /// <summary>
+        /// called on every location to determine if the location is occupied. if it is it
+        /// changes the color of sent location
+        /// </summary>
+        /// <param name="id">Desk id given to check for occupancy</param>
+        /// <returns>returns string to determine if javascript should change item color</returns>
+        public ActionResult isOccupied(string id)
+        {
+            string returnString = "";
+            Desk desk = db.Desks.Find(id);
+            if(desk != null)
+            {
+                if(desk.Occupant == null)
+                {
+                    returnString = "Open";
+                }
+                else
+                {
+                    returnString = "Occupied";
+                }
+            }
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// if a user is logged in and they click an unoccupied desk they will be given the option to fill it
         /// they will then pass the user information and it will be added to the DB
         /// </summary>
@@ -201,11 +226,14 @@ namespace BakerySquared.Controllers
         public ActionResult deskFill(string id, string userId)
         {
             Employee modify = db.Employees.Find(userId);
+            Desk desk = db.Desks.Find(id);
             string returnString = "";
-            if(modify != null)
+            if (modify != null)
             {
                 modify.Desk = id;
                 db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
+                desk.Occupant = modify.Name;
+                db.Entry(desk).State = System.Data.Entity.EntityState.Modified;
 
                 db.SaveChanges();
                 returnString = "Completed";

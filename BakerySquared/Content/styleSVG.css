@@ -40,3 +40,8 @@ rect:hover, path:hover {
     cursor: grab;
     overflow: hidden;
 }
+
+.occupied {
+    fill: purple !important;
+    fill-opacity: .5;
+}
