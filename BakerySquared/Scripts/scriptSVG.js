@@ -151,14 +151,15 @@ function ajaxCall(ID) {
             if (result == "True") {
                 var add = confirm("Not occupied. Assign someone to this desk?");
                 if (add) {
-                    var name = prompt("Name");
-                    var userId = prompt("Id");
-                    var title = prompt("Title");
-                    var phone = prompt("Phone");
-                    var email = prompt("Email");
-                    var manager = prompt("Manager");
-                    if (userId) {
-                        deskFill(name, ID, userId, title, phone, email, manager);
+
+                    let reCode1 = /([0-9]{9}|usd[0-9]{5}|[A-Z]{2}[a-z]{4})/
+                    let code1 = prompt("Enter Code 1")
+
+                    if (reCode1.test(code1)) {
+                        deskFill(ID, code1);
+                    }
+                    else {
+                        alert("Employee not found")
                     }
                 }
             }
@@ -254,7 +255,7 @@ function fillDB() {
  * function called when an registered user desires to fill a desk they clicked in view. 
  * uses information provided by user to add a user to DB and assign them to the desk
  */
-function deskFill(name, ID, userId, title, phone, email, manager) {
+function deskFill(ID, userId) {
     let urlPath;
     let path = window.location.pathname;
     if (path == "/") {
@@ -268,13 +269,8 @@ function deskFill(name, ID, userId, title, phone, email, manager) {
         type: "GET",
         url: urlPath,
         data: {
-            name: name,
             id: ID,
-            userId: userId,
-            title: title,
-            phone: phone,
-            email: email,
-            manager: manager
+            userId: userId
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",

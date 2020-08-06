@@ -194,29 +194,28 @@ namespace BakerySquared.Controllers
         /// if a user is logged in and they click an unoccupied desk they will be given the option to fill it
         /// they will then pass the user information and it will be added to the DB
         /// </summary>
-        /// <param name="name">name of person filling desk</param>
         /// <param name="id">desk id</param>
         /// <param name="userId">employee id</param>
-        /// <param name="title">employee title</param>
-        /// <param name="phone">employee phone</param>
-        /// <param name="email">employee email</param>
-        /// <param name="manager">employee manager</param>
         /// <returns>returns completed upon successful addition to DB</returns>
         [HttpGet]
-        public ActionResult deskFill(string name, string id, string userId, string title, string phone, string email, string manager)
+        public ActionResult deskFill(string id, string userId)
         {
-            Employee toAdd = new Employee();
-            toAdd.Desk = id;
-            toAdd.Name = name;
-            toAdd.Id = userId;
-            toAdd.Title = title;
-            toAdd.Phone = phone;
-            toAdd.Email = email;
-            toAdd.Manager = manager;
-            db.Employees.Add(toAdd);
+            Employee modify = db.Employees.Find(userId);
+            string returnString = "";
+            if(modify != null)
+            {
+                modify.Desk = id;
+                db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
 
-            db.SaveChanges();
-            return Json("Completed ", JsonRequestBehavior.AllowGet);
+                db.SaveChanges();
+                returnString = "Completed";
+            }
+            else
+            {
+                returnString = "Employee not found";
+            }
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
         }
     }
 }
