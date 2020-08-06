@@ -18,41 +18,15 @@ using BSDB.Models;
 
 namespace BakerySquared.Controllers
 {
+    [Authorize]
     /// <summary>
     /// Class containing the views for the Floor plans as well as controller methods to interact with database
     /// </summary>
     public class HomeController : Controller
     {
-        /// <summary>
-        /// Displays Index page
-        /// </summary>
-        /// <returns> view containing index data</returns>
-        public ActionResult Index()
-        {
-            return View();
-        }
-        /// <summary>
-        /// Displays about page
-        /// </summary>
-        /// <returns> view containing about data</returns>
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
+        private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
 
-            return View();
-        }
-
-        /// <summary>
-        /// Displays contact page
-        /// </summary>
-        /// <returns> view containing contact data</returns>
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-
+        [AllowAnonymous]
         /// <summary>
         /// Displays Floor page
         /// </summary>
@@ -62,6 +36,7 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         /// <summary>
         /// Displays Floor page
         /// </summary>
@@ -71,6 +46,7 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         /// <summary>
         /// Displays Floor page
         /// </summary>
@@ -80,6 +56,7 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         /// <summary>
         /// Displays Floor page
         /// </summary>
@@ -89,6 +66,7 @@ namespace BakerySquared.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         /// <summary>
         /// Displays Floor page
         /// </summary>
@@ -102,12 +80,43 @@ namespace BakerySquared.Controllers
         /// takes the id sent from the client after user click and uses it to search the db
         /// </summary>
         /// <param name="id">id of the element that was clicked by user</param>
-        /// <returns>returns Json string containing id and hello, temp</returns>
+        /// <returns>returns Json string containing information for space</returns>
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult GetController(String id)
         {
-            String userId = id + " hello";
-            return Json(userId, JsonRequestBehavior.AllowGet);
+            string returnString = null;
+            var employees = from e in db.Employees select e;
+
+            employees = employees.Where(e => e.Desk.Contains(id));
+
+            employees.ToList();
+
+            foreach (Employee e in employees)
+            {
+                string userName = e.Name + "\n";
+                string userId = e.Id + "\n";
+                string userTitle = e.Title + "\n";
+                string userPhone = e.Phone + "\n";
+                string userDesk = e.Desk + "\n";
+                string userEmail = e.Email + "\n";
+                string userManager = e.Manager + "\n";
+                returnString = "Name: " + userName + "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: "
+                    + userDesk + "Email: " + userEmail + "Manager: " + userManager;
+            }
+
+            if (returnString == null)
+            {
+                if (Request.IsAuthenticated)
+                {
+                    returnString = "True";
+                }
+                else
+                {
+                    returnString = "Not Occupied";
+                }
+            }
+            return Json(returnString, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -118,12 +127,33 @@ namespace BakerySquared.Controllers
         /// to update db</param>
         /// <returns>returns json string to client containing all floor location ids</returns>
         [HttpGet]
-        public ActionResult refillDB(String floor)
+        public ActionResult refillDB(string floor)
         {
+            var desks = from e in db.Desks select e;
+
+            desks = desks.Where(e => e.Desk_Id.Contains(floor));
+
+            foreach (Desk e in desks)
+            {
+                string id = e.Desk_Id;
+                if (id.Length == 5 && id[1] == floor[0])
+                {
+                    db.Desks.Remove(e);
+                }
+            }
             string ids = FileRegex(floor);
             string[] locations = ids.Split(' ');
-            
-            return Json("Completed "+locations, JsonRequestBehavior.AllowGet);
+            foreach (string d in locations)
+            {
+                if (d.Length == 5)
+                {
+                    Desk toAdd = new Desk();
+                    toAdd.Desk_Id = d;
+                    db.Desks.Add(toAdd);
+                }
+            }
+            db.SaveChanges();
+            return Json("Completed ", JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -158,6 +188,35 @@ namespace BakerySquared.Controllers
 
             file.Close();
             return ids;
+        }
+
+        /// <summary>
+        /// if a user is logged in and they click an unoccupied desk they will be given the option to fill it
+        /// they will then pass the user information and it will be added to the DB
+        /// </summary>
+        /// <param name="name">name of person filling desk</param>
+        /// <param name="id">desk id</param>
+        /// <param name="userId">employee id</param>
+        /// <param name="title">employee title</param>
+        /// <param name="phone">employee phone</param>
+        /// <param name="email">employee email</param>
+        /// <param name="manager">employee manager</param>
+        /// <returns>returns completed upon successful addition to DB</returns>
+        [HttpGet]
+        public ActionResult deskFill(string name, string id, string userId, string title, string phone, string email, string manager)
+        {
+            Employee toAdd = new Employee();
+            toAdd.Desk = id;
+            toAdd.Name = name;
+            toAdd.Id = userId;
+            toAdd.Title = title;
+            toAdd.Phone = phone;
+            toAdd.Email = email;
+            toAdd.Manager = manager;
+            db.Employees.Add(toAdd);
+
+            db.SaveChanges();
+            return Json("Completed ", JsonRequestBehavior.AllowGet);
         }
     }
 }

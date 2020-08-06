@@ -1,6 +1,6 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * @file
- * @brief Controlls all the employee views and interacts with the database
+ * @brief Controller for the Employee model.
  *
  * *****************************************************************************
  *   Copyright (c) 2020 Koninklijke Philips N.V.
@@ -14,104 +14,238 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using BSDB.Models;
+using Microsoft.Ajax.Utilities;
 
-namespace BakerySquared.Controllers
+namespace BSDB.Controllers
 {
+    /// <summary>
+    /// Controller for the Employee table of the database
+    /// </summary>
     public class EmployeesController : Controller
     {
         private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
 
-        // GET: Employees
-        public ActionResult Index()
+        /// <summary>
+        /// handles the search and sort functionality
+        /// </summary>
+        /// <param name="sortOrder"></param>
+        /// <param name="searchString"></param>
+        /// <returns></returns>
+        public ActionResult Index(string sortOrder, string searchString)
         {
-            return View(db.Employees.ToList());
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+
+            var employees = from e in db.Employees select e;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                employees = employees.Where(e => e.Name.Contains(searchString) || e.Email.Contains(searchString) || 
+                e.Phone.Contains(searchString) || e.Email.Contains(searchString) || e.Desk.Contains(searchString) || 
+                e.Manager.Contains(searchString) || e.Id.Contains(searchString) || e.Title.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    {
+                        employees = employees.OrderByDescending(e => e.Name);
+                        break;
+                    }
+                default:
+                    {
+                        employees = employees.OrderBy(e => e.Name);
+                        break;
+                    }
+            }
+            return View(employees.ToList());
         }
 
-        // GET: Employees/Details/5
+        /// <summary>
+        /// shows details about the selected entry from the employee table
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Details(string id)
         {
+            ActionResult result = null;
+
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
+            else
             {
-                return HttpNotFound();
+                Employee employee = db.Employees.Find(id);
+                if (employee == null)
+                {
+                    result = HttpNotFound();
+                }
+                else
+                {
+                    result = View(employee);
+                }
             }
-            return View(employee);
+
+            return result;
         }
 
-        // GET: Employees/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Employees/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// adds an entry to the employee table
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Name,Title,Desk,Email,Phone,Id,Manager")] Employee employee)
         {
-            if (ModelState.IsValid)
+            ActionResult result = null;
+            Boolean deskFound = false;
+            Boolean deskEmpty = false;
+            
+            Desk d = db.Desks.Find(employee.Desk);
+            if (d == null)
+            {
+                ViewBag.message = "Desk not found.";
+            }
+            else
+            {
+                deskFound = true;
+
+                if (d.Occupant.IsNullOrWhiteSpace())
+                {
+                    deskEmpty = true;
+                }
+                else
+                {
+                    ViewBag.message = "This desk is already occupied by " + d.Occupant;
+                }
+            }
+
+            if (ModelState.IsValid && deskFound == true && deskEmpty == true)
             {
                 db.Employees.Add(employee);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                result = RedirectToAction("Index");
+            }
+            else
+            {
+                result = View(employee);
             }
 
-            return View(employee);
+            return result;
         }
 
-        // GET: Employees/Edit/5
+        /// <summary>
+        /// edits an entry from the employee table
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Edit(string id)
         {
+            ActionResult result = null;
+
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
+            else
             {
-                return HttpNotFound();
+                Employee employee = db.Employees.Find(id);
+                if (employee == null)
+                {
+                    result = HttpNotFound();
+                }
+                else
+                {
+                    result = View(employee);
+                }
             }
-            return View(employee);
+            
+            return result;
         }
 
-        // POST: Employees/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// If the desk assigned to a user matches the appropriate format for a desk then it will route to the 
+        /// proper floor and highlight the desk
+        /// </summary>
+        /// <param name="desk"> the desk assigned to the user that is being found</param>
+        /// <returns>url that directs to the proper floor or current page if not right format</returns>
+        public ActionResult Find(string desk)
+        {
+            Regex rx = new Regex("^(M|D|S)[0-9]{4}$",
+                   RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            string url = this.Request.UrlReferrer.AbsolutePath; 
+
+            Match match = rx.Match(desk);
+            if (match.Success)
+            {
+                char floor = desk[1];
+                url = "../Home/Floor" + floor + "?ID=" + desk;
+            }
+            return Redirect(url);
+        }
+
+        /// <summary>
+        /// Saves changes to the database
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Name,Title,Desk,Email,Phone,Id,Manager")] Employee employee)
         {
+            ActionResult result = null;
+
             if (ModelState.IsValid)
             {
                 db.Entry(employee).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                result = RedirectToAction("Index");
             }
-            return View(employee);
+            else
+            {
+                result = View(employee);
+            }
+
+            return result;
         }
 
-        // GET: Employees/Delete/5
+        /// <summary>
+        /// deletes an entry from the employee table
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Delete(string id)
         {
+            ActionResult result = null;
+
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
+            else
             {
-                return HttpNotFound();
+                Employee employee = db.Employees.Find(id);
+                if (employee == null)
+                {
+                    result = HttpNotFound();
+                }
+                else
+                {
+                    result = View(employee);
+                }               
             }
-            return View(employee);
+
+            return result;
         }
 
         // POST: Employees/Delete/5

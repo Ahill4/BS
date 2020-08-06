@@ -22,11 +22,9 @@
     </select>
     <input onclick="setFloor()" type="button" value="Submit" />
 </form>
-
-<form>
-    <input type="text" placeholder="Search.." id="search" />
-    <input type="button" class="btn btn-info" value="Let's Go!" onclick="searchBar()" />
-</form>
-<input onclick="collectDB()" type="button" value="Array" />
+@if (Request.IsAuthenticated)
+{
+<input onclick="fillDB()" type="button" value="Populate DB" />
+}
 
 <input id="test" min="10" max="25" value='10' step="1" onchange="showVal(this.value)" type="range" />

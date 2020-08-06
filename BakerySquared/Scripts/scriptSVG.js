@@ -33,7 +33,9 @@ var reD = /(D|M|S)[0-9]{4}/
 $(document).ready(function () {
     const path = window.location.pathname;
     currentFloor = path[path.length - 1];
-
+    if (currentFloor == "/") {
+        currentFloor = "1";
+    }
     $("*").each(function () {
         if (reD.test(this.id)) {
             $("#" + this.id).on("click", GetController);
@@ -111,30 +113,6 @@ function GetController() {
 }
 
 /*
- * Function searchBar:
- * 
- * Function is called when the submit button on the search bar is hit. used for routing to new floor if necessary
- * if not necessary to go to new floor it
- */
-function searchBar() {
-    //get value entered in the search bar
-    var searchedVal = document.getElementById("search").value;
-
-    //check it to make sure it is proper format ID
-    if (reD.test(searchedVal)) {
-
-        //compare the floor value from the id to current floor and if not equal redirect to proper floor
-        if (searchedVal[1] != currentFloor) {
-            window.location.href = '/Home/Floor' + searchedVal[1] + "?ID=" + searchedVal;
-        }
-        else if (searchedVal[1] == currentFloor) {
-            setFill(searchedVal);
-            ajaxCall(searchedVal);
-        }
-    }
-};
-
-/*
  * Function setFill
  * 
  * Function is called to restore the last ID to its proper fill and set the fill of the new object to the red shown when clicked
@@ -151,16 +129,42 @@ function setFill(currentID) {
  * Called when making a call to the controller sends an alert if controller responds with Json
  */
 function ajaxCall(ID) {
+    //checks if default page or regular floor page so that it can route to the right controller method
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/GetController';
+    }
+    else {
+        urlPath = 'GetController'
+    }
+
     $.ajax({
         type: "GET",
-        url: 'GetController',
+        url: urlPath,
         data: {
             id: ID
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
-            alert(result)
+            if (result == "True") {
+                var add = confirm("Assign someone to this desk?");
+                if (add) {
+                    var name = prompt("Name");
+                    var userId = prompt("Id");
+                    var title = prompt("Title");
+                    var phone = prompt("Phone");
+                    var email = prompt("Email");
+                    var manager = prompt("Manager");
+                    if (userId) {
+                        deskFill(name, ID, userId, title, phone, email, manager);
+                    }
+                }
+            }
+            else {
+                alert(result);
+            }
         },
         error: function (response) {
             alert('error');
@@ -211,23 +215,66 @@ function showVal(a) {
     setZoom(zoomScale, document.getElementsByClassName('mapContainer')[0])
 }
 
-function collectDB() {
-    var locations = [];
-    $("*").each(function () {
-        if (reD.test(this.id)) {
-            locations.push(this.id);
-        }
-    });
-    console.log(locations);
-    fillDB();
-}
-
+/*
+ * Function fillDB
+ *
+ * function called from view to repopulate Db with all the locations from the current floor to 
+ * be used after a floor plan change
+ */
 function fillDB() {
+    //checks if default page or regular floor page so that it can route to the right controller method
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/refillDB';
+    }
+    else {
+        urlPath = 'refillDB'
+    }
     $.ajax({
         type: "GET",
-        url: 'refillDB',
+        url: urlPath,
         data: {
             floor: currentFloor
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            alert(result)
+        },
+        error: function (response) {
+            alert("error");
+        }
+    });
+}
+
+/*
+ * Function deskFill
+ *
+ * function called when an registered user desires to fill a desk they clicked in view. 
+ * uses information provided by user to add a user to DB and assign them to the desk
+ */
+function deskFill(name, ID, userId, title, phone, email, manager) {
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/deskFill';
+    }
+    else {
+        urlPath = 'deskFill'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {
+            name: name,
+            id: ID,
+            userId: userId,
+            title: title,
+            phone: phone,
+            email: email,
+            manager: manager
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",
