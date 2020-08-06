@@ -27,9 +27,11 @@ namespace BakerySquared.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private IAccountRepository _repository;
 
         public AccountController()
         {
+            this._repository = new EFAccountRepository();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -671,8 +673,10 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public ActionResult RegisteredAdmins()
         {
-            var context = ApplicationDbContext.Create();
-            var admins = context.Users.ToList();
+            //var context = ApplicationDbContext.Create();
+            //var admins = context.Users.ToList();
+
+            var admins = _repository.ListUsers();
 
             return View(admins);
         }
