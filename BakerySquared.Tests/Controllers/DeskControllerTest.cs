@@ -25,7 +25,7 @@ namespace BakerySquared.Tests.Controllers
             var controller = new DesksController(mock.Object);
 
             // Act
-            var result = controller.Index();
+            //var result = controller.Index();
 
             // Assert
 

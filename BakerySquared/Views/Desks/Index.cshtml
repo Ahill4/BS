@@ -1,39 +1,66 @@
-﻿@model IEnumerable<BSDB.Models.Desk>
+﻿@*/*******************************************************************************
+    * @file
+    * @brief Controller for the Employee model.
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/*@
+@model PagedList.IPagedList<BSDB.Models.Desk>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Desks";
 }
 
-<h2>Index</h2>
+<h2>Desks</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Search: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" />
+    </p>
+
+}
+
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Desk_Id)
+            @Html.ActionLink("Desk Id", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Occupant)
+            @Html.ActionLink("Occupant", "Index", new { sortOrder = ViewBag.OccuSortParm, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Desk_Id)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Occupant)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Desk_Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Desk_Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Desk_Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Desk_Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Occupant)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Desk_Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Desk_Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Desk_Id })
+            </td>
+        </tr>
+    }
 
 </table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
