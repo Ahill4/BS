@@ -149,7 +149,7 @@ function ajaxCall(ID) {
         dataType: "json",
         success: function (result) {
             if (result == "True") {
-                var add = confirm("Assign someone to this desk?");
+                var add = confirm("Not occupied. Assign someone to this desk?");
                 if (add) {
                     var name = prompt("Name");
                     var userId = prompt("Id");

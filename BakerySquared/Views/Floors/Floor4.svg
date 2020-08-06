@@ -14,7 +14,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   sodipodi:docname="Floor4_no_text.svg">
+   sodipodi:docname="Floor4.svg">
   <defs
      id="defs2">
     <clipPath
@@ -102,11 +102,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="818.84812"
-     inkscape:cy="300.91009"
+     inkscape:zoom="1.4"
+     inkscape:cx="497.81659"
+     inkscape:cy="251.95844"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="g841"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2400"
@@ -122,11 +122,12 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
+     style="display:inline"
      inkscape:label="base"
      inkscape:groupmode="layer"
      id="layer1"
@@ -137,24 +138,10 @@
        id="g841"
        style="opacity:1">
       <g
-         id="g843">
-        <g
-           clip-path="url(#clipPath849)"
-           id="g845" />
-      </g>
-      <text
-         id="text859"
-         style="font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.0677px;font-family:'Times New Roman';-inkscape-font-specification:TimesNewRomanPS-BoldMT;writing-mode:lr-tb;fill:#818385;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.85952"
-         transform="scale(0.79886153,-1.2517814)"
-         x="1016.257"
-         y="-97.648506"><tspan
-           id="tspan857"
-           y="-97.648506"
-           x="1016.257"
-           style="stroke-width:0.85952">5</tspan></text>
-      <g
          id="g879"
-         transform="matrix(0.68663744,0,0,1.0759312,1.0714286,95.637557)">
+         transform="matrix(0.68663744,0,0,1.0759312,1.0714286,95.637557)"
+         sodipodi:insensitive="true"
+         style="display:inline">
         <g
            clip-path="url(#clipPath885)"
            id="g881">
@@ -177,7 +164,7 @@
       </g>
       <g
          id="g893"
-         transform="matrix(0.68663744,0,0,1.0759312,1.0714286,95.637557)">
+         transform="matrix(0.68663744,0,0,1.0759312,1.1884256,96.02488)">
         <g
            clip-path="url(#clipPath899)"
            id="g895">
@@ -197,34 +184,6 @@
             </g>
           </g>
         </g>
-      </g>
-      <path
-         id="path907"
-         style="fill:#dcd8ca;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.85952"
-         d="m 401.90565,677.68404 h 9.96998 v -6.90748 h -9.96998 z" />
-      <g
-         id="g923">
-        <g
-           clip-path="url(#clipPath929)"
-           id="g925" />
-      </g>
-      <g
-         id="g943">
-        <g
-           clip-path="url(#clipPath949)"
-           id="g945" />
-      </g>
-      <g
-         id="g969">
-        <g
-           clip-path="url(#clipPath975)"
-           id="g971" />
-      </g>
-      <g
-         id="g991">
-        <g
-           clip-path="url(#clipPath997)"
-           id="g993" />
       </g>
     </g>
   </g>
@@ -775,7 +734,8 @@
      inkscape:label="Enclave"
      id="layer5"
      inkscape:groupmode="layer"
-	 class="enclave"/>
+     class="enclave"
+     style="display:inline" />
   <g
      inkscape:groupmode="layer"
      id="layer4"
@@ -859,5 +819,6 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Meetings"
-     class="meeting" />
+     class="meeting"
+     style="display:inline" />
 </svg>
