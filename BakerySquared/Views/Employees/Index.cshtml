@@ -1,7 +1,18 @@
-﻿@model IEnumerable<BSDB.Models.Employee>
+﻿@*/*******************************************************************************
+    * @file
+    * @brief Controller for the Employee model.
+    *
+    * *****************************************************************************
+    *   Copyright (c) 2020 Koninklijke Philips N.V.
+    *   All rights are reserved. Reproduction in whole or in part is
+    *   prohibited without the prior written consent of the copyright holder.
+    *******************************************************************************/*@
+@model PagedList.IPagedList<BSDB.Models.Employee>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Employees";
 }
 
 <h2>Index</h2>
@@ -21,22 +32,25 @@
 <table class="table">
     <tr>
         <th>
+            @Html.ActionLink("Id", "Index", new { sortOrder = ViewBag.IdSortParm })
+        </th>
+        <th>
             @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.ActionLink("Title", "Index", new { sortOrder = ViewBag.TitleSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Desk)
+            @Html.ActionLink("Desk", "Index", new { sortOrder = ViewBag.DeskSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Phone)
+            @Html.ActionLink("Phone", "Index", new { sortOrder = ViewBag.PhoneSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Manager)
+            @Html.ActionLink("Manager", "Index", new { sortOrder = ViewBag.MngrSortParm })
         </th>
         <th></th>
     </tr>
@@ -44,6 +58,9 @@
     @foreach (var item in Model)
     {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
@@ -72,3 +89,7 @@
     }
 
 </table>
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
