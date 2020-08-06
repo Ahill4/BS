@@ -38,5 +38,6 @@ rect:hover, path:hover {
     width: 1000px;
     height: 575px;
     cursor: grab;
+    overflow: auto;
     overflow: hidden;
 }
