@@ -26,6 +26,11 @@ namespace BakerySquared.Controllers
             this._repository = new EFDesksRepository();
         }
 
+        public DesksController(IDesksRepository repository)
+        {
+            _repository = repository;
+        }
+
 
         // GET: Desks
         public ActionResult Index()
