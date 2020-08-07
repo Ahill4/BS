@@ -99,13 +99,14 @@ namespace BakerySquared.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Details(string id)
+        public ViewResult Details(string id)
         {
-            ActionResult result;
+            ViewResult result;
 
             if (id == null)
             {
-                result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                ModelState.AddModelError("", "Desk Id not found.");
+                result = View();
             }
             else
             {
@@ -113,7 +114,8 @@ namespace BakerySquared.Controllers
 
                 if (desk == null)
                 {
-                    result = HttpNotFound();
+                    ModelState.AddModelError("", "Desk Id not found.");
+                    result = View();
                 }
                 else
                 {

@@ -39,5 +39,23 @@ namespace BakerySquared.Tests.Controllers
             // Assert
             Assert.IsInstanceOfType(actual, typeof(PagedList<Desk>));
         }
+
+        [TestMethod]
+        public void Details_ViewContains_DeskIdAndOccupant()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "D1000", Occupant = "Occupant1" });
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = (Desk)controller.Details("").Model;
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(Desk));
+        }
     }
+
 }
