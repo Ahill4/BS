@@ -1,6 +1,6 @@
 ﻿/*******************************************************************************
  * @file
- * @brief Manages the help console command and it's arguments.
+ * @brief Controlls all the Desk views and interacts with the database
  *
  * *****************************************************************************
  *   Copyright (c) 2020 Koninklijke Philips N.V.
@@ -19,7 +19,7 @@ using System.Web.Mvc;
 using BSDB.Models;
 using PagedList;
 
-namespace BSDB.Controllers
+namespace BakerySquared.Controllers
 {
     /// <summary>
     /// Controller for the Desk table of the database
