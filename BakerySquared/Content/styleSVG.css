@@ -42,6 +42,6 @@ rect:hover, path:hover {
 }
 
 .occupied {
-    fill: purple !important;
+    fill: purple;
     fill-opacity: .5;
 }

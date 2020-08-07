@@ -119,7 +119,12 @@ function GetController() {
  * Function is called to restore the last ID to its proper fill and set the fill of the new object to the red shown when clicked
  */
 function setFill(currentID) {
-    $("#" + lastID).css("fill", "inherit");
+    if (lastID && occupyFill(lastID)) {
+        $("#" + lastID).css("fill", "purple");
+    }
+    else {
+        $("#" + lastID).css("fill", "inherit");
+    }
     lastID = currentID;
     $("#" + currentID).css("fill", "red");
 }
@@ -159,7 +164,7 @@ function ajaxCall(ID) {
                     if (reCode1.test(code1)) {
                         deskFill(ID, code1);
                     }
-                    else {
+                    else if(code1){
                         alert("Employee not found")
                     }
                 }
@@ -311,7 +316,6 @@ function isOccupied(id){
         success: function (result) {
             if (result == "Occupied") {
                 var v = document.getElementById(id);
-                console.log(v);
                 v.classList.add("occupied");
             }
         },
@@ -319,4 +323,15 @@ function isOccupied(id){
             alert("Cannot determine Occupancy");
         }
     });
+}
+
+/*
+ * function occupyFill
+ * 
+ * checks to see if a location contains the occupied css class. if it does return true else false.
+ * this allows the setfill to determine if it should inherit or fill with purple if it is occupied.
+ */
+function occupyFill(id) {
+    var v = document.getElementById(id);
+    return v.classList.contains("occupied");
 }
