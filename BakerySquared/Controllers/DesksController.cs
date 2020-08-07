@@ -43,10 +43,6 @@ namespace BakerySquared.Controllers
 
         public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
-            //IEnumerable<Desk> deskList = db.Desks.ToList();
-            //IEnumerable<Desk> deskList = _repository.ToList();
-
-            //return View(deskList);
             ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
             ViewBag.OccuSortParm = sortOrder == "occu" ? "occu_desc" : "occu";
@@ -62,33 +58,39 @@ namespace BakerySquared.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var desks = from d in db.Desks select d;
+            //var desks = from d in db.Desks select d;
+            var desks = _repository.ToQuery();
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                desks = desks.Where(d => d.Desk_Id.Contains(searchString) || d.Occupant.Contains(searchString));
+                //desks = desks.Where(d => d.Desk_Id.Contains(searchString) || d.Occupant.Contains(searchString));
+                desks = _repository.Contains(desks, searchString);
             }
 
             switch (sortOrder)
             {
                 case "occupant_desc":
                     {
-                        desks = desks.OrderByDescending(d => d.Desk_Id);
+                        //desks = desks.OrderByDescending(d => d.Desk_Id);
+                        desks = _repository.OrderByDescendingId(desks);
                         break;
                     }
                 case "occu":
                     {
-                        desks = desks.OrderBy(d => d.Occupant);
+                        //desks = desks.OrderBy(d => d.Occupant);
+                        desks = _repository.OrderByAscendingOccupant(desks);
                         break;
                     }
                 case "occu_desc":
                     {
-                        desks = desks.OrderByDescending(d => d.Occupant);
+                        //desks = desks.OrderByDescending(d => d.Occupant);
+                        desks = _repository.OrderByDescendingOccupant(desks);
                         break;
                     }
                 default: //desc Desk_Id
                     {
-                        desks = desks.OrderBy(d => d.Desk_Id);
+                        //desks = desks.OrderBy(d => d.Desk_Id);
+                        desks = _repository.OrderByAscendingId(desks);
                         break;
                     }
             }
@@ -96,7 +98,6 @@ namespace BakerySquared.Controllers
             int pageSize = 20;
             int pageNumber = (page ?? 1);
             return View(desks.ToPagedList(pageNumber, pageSize));
-            //return View(employees.ToList());
         }
 
         /// <summary>
@@ -106,7 +107,8 @@ namespace BakerySquared.Controllers
         /// <returns></returns>
         public ActionResult Details(string id)
         {
-            ActionResult result = null;
+            ActionResult result;
+
             if (id == null)
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -118,7 +120,9 @@ namespace BakerySquared.Controllers
             //if (desk == null)
             else
             {
-                Desk desk = db.Desks.Find(id);
+                //Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
                     result = HttpNotFound();
@@ -146,27 +150,23 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Desk_Id,Occupant")] Desk desk)
         {
-            ActionResult result = null;
+            ActionResult result;
 
             if (ModelState.IsValid)
             {
                 //db.Desks.Add(desk);
                 //db.SaveChanges();
 
-                //if(!_repository.AlreadyExists(desk))
-                //{
-                    //_repository.Create(desk);
-                    //return RedirectToAction("Index");
-                //}
-                //else
-                //{
-                    //ModelState.AddModelError("", "Desk already exists.");
-                    //return View(desk);
-                //}
-
-                db.Desks.Add(desk);
-                db.SaveChanges();
-                result = RedirectToAction("Index");
+                if (!_repository.AlreadyExists(desk))
+                {
+                    _repository.Create(desk);
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Desk already exists.");
+                    result = View(desk);
+                }
             }
             else
             {
@@ -183,19 +183,17 @@ namespace BakerySquared.Controllers
         /// <returns></returns>
         public ActionResult Edit(string id)
         {
-            ActionResult result = null;
+            ActionResult result;
+
             if (id == null)
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
-            //Desk desk = db.Desks.Find(id);
-            //Desk desk = _repository.Find(id);
-
-            //if (desk == null)
             else
             {
-                Desk desk = db.Desks.Find(id);
+                //Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
                     result = HttpNotFound();
@@ -205,9 +203,6 @@ namespace BakerySquared.Controllers
                     result = View(desk);
                 }
             }
-
-
-
             return result;
         }
 
@@ -220,17 +215,14 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Desk_Id,Occupant")] Desk desk)
         {
-            ActionResult result = null;
+            ActionResult result;
 
             if (ModelState.IsValid)
             {
                 //db.Entry(desk).State = EntityState.Modified;
                 //db.SaveChanges();
-                //_repository.Edit(desk);
+                _repository.Edit(desk);
 
-                //return RedirectToAction("Index");
-                db.Entry(desk).State = EntityState.Modified;
-                db.SaveChanges();
                 result = RedirectToAction("Index");
             }
             else
@@ -248,19 +240,19 @@ namespace BakerySquared.Controllers
         /// <returns></returns>
         public ActionResult Delete(string id)
         {
-            ActionResult result = null;
+            ActionResult result;
             if (id == null)
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             //Desk desk = db.Desks.Find(id);
-            //Desk desk = _repository.Find(id);
 
-            //if (desk == null)
             else
             {
-                Desk desk = db.Desks.Find(id);
+                //Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
                     result = HttpNotFound();
@@ -281,15 +273,8 @@ namespace BakerySquared.Controllers
             //Desk desk = db.Desks.Find(id);
             //db.Desks.Remove(desk);
             //db.SaveChanges();
-            //_repository.Delete(id);
+            _repository.Delete(id);
 
-            //Desk d = new Desk();
-            //d.Desk_Id = " <Your string> ";
-            //db.Desks.Add(d);
-
-            Desk desk = db.Desks.Find(id);
-            db.Desks.Remove(desk);
-            db.SaveChanges();
             return RedirectToAction("Index");
         }
 

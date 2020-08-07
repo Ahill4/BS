@@ -1,9 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Data.Entity;
+using BakerySquared.Models;
 using BSDB.Models;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Web;
+using System.Web.Mvc;
+using System.Net;
+using System.Linq;
 
 namespace BakerySquared.Models
 {
@@ -24,7 +28,7 @@ namespace BakerySquared.Models
         }
 
         public void Create(Desk desk)
-        {            
+        {
             db.Desks.Add(desk);
             db.SaveChanges();
         }
@@ -52,6 +56,46 @@ namespace BakerySquared.Models
         public IEnumerable<Desk> ToList()
         {
             return db.Desks.ToList();
+        }
+
+        public IQueryable<Desk> ToQuery()
+        {
+            return from d in db.Desks select d;
+        }
+
+        public IQueryable<Desk> Contains(IQueryable<Desk> desks, string searchString)
+        {
+            var newDesks = desks.Where(d => d.Desk_Id.Contains(searchString) || d.Occupant.Contains(searchString));
+
+            return newDesks;
+        }
+
+        public IQueryable<Desk> OrderByDescendingId(IQueryable<Desk> desks)
+        {
+            var newDesks = desks.OrderByDescending(d => d.Desk_Id);
+
+            return newDesks;
+        }
+
+        public IQueryable<Desk> OrderByDescendingOccupant(IQueryable<Desk> desks)
+        {
+            var newDesks = desks.OrderByDescending(d => d.Occupant);
+
+            return newDesks;
+        }
+
+        public IQueryable<Desk> OrderByAscendingId(IQueryable<Desk> desks)
+        {
+            var newDesks = desks.OrderBy(d => d.Desk_Id);
+
+            return newDesks;
+        }
+
+        public IQueryable<Desk> OrderByAscendingOccupant(IQueryable<Desk> desks)
+        {
+            var newDesks = desks.OrderBy(d => d.Occupant);
+
+            return newDesks;
         }
 
     }

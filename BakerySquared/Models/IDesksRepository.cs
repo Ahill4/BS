@@ -1,8 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using BakerySquared.Models;
 using BSDB.Models;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Web;
+using System.Web.Mvc;
+using System.Net;
+using System.Linq;
 
 namespace BakerySquared.Models
 {
@@ -19,5 +24,17 @@ namespace BakerySquared.Models
         void Delete(string Id);
 
         IEnumerable<Desk> ToList();
+
+        IQueryable<Desk> ToQuery();
+
+        IQueryable<Desk> Contains(IQueryable<Desk> desks, string searchString);
+
+        IQueryable<Desk> OrderByDescendingId(IQueryable<Desk> desks);
+
+        IQueryable<Desk> OrderByDescendingOccupant(IQueryable<Desk> desks);
+
+        IQueryable<Desk> OrderByAscendingId(IQueryable<Desk> desks);
+
+        IQueryable<Desk> OrderByAscendingOccupant(IQueryable<Desk> desks);
     }
 }
