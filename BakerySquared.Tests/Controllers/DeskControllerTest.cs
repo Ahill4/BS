@@ -16,19 +16,6 @@ namespace BakerySquared.Tests.Controllers
     [TestClass]
     public class DeskControllerTest
     { 
-        [TestMethod]
-        public void Index_ReturnsViewResult_WithListOfDesks()
-        {
-            // Arrange
-            var mock = new Mock<IDesksRepository>();
-            mock.Setup(repo => repo.ToList());
-            var controller = new DesksController(mock.Object);
-
-            // Act
-            //var result = controller.Index();
-
-            // Assert
-
-        }
+       
     }
 }
