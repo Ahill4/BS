@@ -283,9 +283,9 @@ namespace BakerySquared.Controllers
             //db.SaveChanges();
             //_repository.Delete(id);
 
-            Desk d = new Desk();
-            d.Desk_Id = " <Your string> ";
-            db.Desks.Add(d);
+            //Desk d = new Desk();
+            //d.Desk_Id = " <Your string> ";
+            //db.Desks.Add(d);
 
             Desk desk = db.Desks.Find(id);
             db.Desks.Remove(desk);
