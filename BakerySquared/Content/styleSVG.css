@@ -10,12 +10,12 @@
     *******************************************************************************/
 
 rect:hover, path:hover {
-    fill: #ff0000 !important;
+    fill: magenta !important;
     cursor: pointer;
 }
 
 .social {
-    fill: green;
+    fill: coral;
     fill-opacity: .5;
 }
 
@@ -25,7 +25,7 @@ rect:hover, path:hover {
 }
 
 .desk {
-    fill: yellow;
+    fill: green;
     fill-opacity: .5;
 }
 
@@ -42,6 +42,6 @@ rect:hover, path:hover {
 }
 
 .occupied {
-    fill: magenta;
+    fill: red;
     fill-opacity: .5;
 }

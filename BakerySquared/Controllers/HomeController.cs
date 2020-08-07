@@ -86,36 +86,44 @@ namespace BakerySquared.Controllers
         public ActionResult GetController(String id)
         {
             string returnString = null;
-            var employees = from e in db.Employees select e;
-
-            employees = employees.Where(e => e.Desk.Contains(id));
-
-            employees.ToList();
-
-            foreach (Employee e in employees)
+            try
             {
-                string userName = e.Name + "\n";
-                string userId = e.Id + "\n";
-                string userTitle = e.Title + "\n";
-                string userPhone = e.Phone + "\n";
-                string userDesk = e.Desk + "\n";
-                string userEmail = e.Email + "\n";
-                string userManager = e.Manager + "\n";
-                returnString = "Name: " + userName + "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: "
-                    + userDesk + "Email: " + userEmail + "Manager: " + userManager;
+                var employees = from e in db.Employees select e;
+
+                employees = employees.Where(e => e.Desk.Contains(id));
+
+                employees.ToList();
+
+                foreach (Employee e in employees)
+                {
+                    string userName = e.Name + "\n";
+                    string userId = e.Id + "\n";
+                    string userTitle = e.Title + "\n";
+                    string userPhone = e.Phone + "\n";
+                    string userDesk = e.Desk + "\n";
+                    string userEmail = e.Email + "\n";
+                    string userManager = e.Manager + "\n";
+                    returnString = "Name: " + userName + "ID: " + userId + "Title: " + userTitle + "Phone: " + userPhone + "Desk: "
+                        + userDesk + "Email: " + userEmail + "Manager: " + userManager;
+                }
+
+                if (returnString == null)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        returnString = "True";
+                    }
+                    else
+                    {
+                        returnString = "Not Occupied";
+                    }
+                }
+            }
+            catch
+            {
+                returnString = "DB error";
             }
 
-            if (returnString == null)
-            {
-                if (Request.IsAuthenticated)
-                {
-                    returnString = "True";
-                }
-                else
-                {
-                    returnString = "Not Occupied";
-                }
-            }
             return Json(returnString, JsonRequestBehavior.AllowGet);
         }
 
@@ -129,31 +137,41 @@ namespace BakerySquared.Controllers
         [HttpGet]
         public ActionResult refillDB(string floor)
         {
-            var desks = from e in db.Desks select e;
-
-            desks = desks.Where(e => e.Desk_Id.Contains(floor));
-
-            foreach (Desk e in desks)
+            string returnString = null;
+            try
             {
-                string id = e.Desk_Id;
-                if (id.Length == 5 && id[1] == floor[0])
+                var desks = from e in db.Desks select e;
+
+                desks = desks.Where(e => e.Desk_Id.Contains(floor));
+
+                foreach (Desk e in desks)
                 {
-                    db.Desks.Remove(e);
+                    string id = e.Desk_Id;
+                    if (id.Length == 5 && id[1] == floor[0])
+                    {
+                        db.Desks.Remove(e);
+                    }
                 }
+                string ids = FileRegex(floor);
+                string[] locations = ids.Split(' ');
+                foreach (string d in locations)
+                {
+                    if (d.Length == 5)
+                    {
+                        Desk toAdd = new Desk();
+                        toAdd.Desk_Id = d;
+                        db.Desks.Add(toAdd);
+                    }
+                }
+                db.SaveChanges();
+                returnString = "Completed";
             }
-            string ids = FileRegex(floor);
-            string[] locations = ids.Split(' ');
-            foreach (string d in locations)
+            catch
             {
-                if (d.Length == 5)
-                {
-                    Desk toAdd = new Desk();
-                    toAdd.Desk_Id = d;
-                    db.Desks.Add(toAdd);
-                }
+                returnString = "DB error";
             }
-            db.SaveChanges();
-            return Json("Completed", JsonRequestBehavior.AllowGet);
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -196,20 +214,28 @@ namespace BakerySquared.Controllers
         /// </summary>
         /// <param name="id">Desk id given to check for occupancy</param>
         /// <returns>returns string to determine if javascript should change item color</returns>
+        [AllowAnonymous]
         public ActionResult isOccupied(string id)
         {
             string returnString = "";
-            Desk desk = db.Desks.Find(id);
-            if(desk != null)
+            try
             {
-                if(desk.Occupant == null)
+                Desk desk = db.Desks.Find(id);
+                if (desk != null)
                 {
-                    returnString = "Open";
+                    if (desk.Occupant == null)
+                    {
+                        returnString = "Open";
+                    }
+                    else
+                    {
+                        returnString = "Occupied";
+                    }
                 }
-                else
-                {
-                    returnString = "Occupied";
-                }
+            }
+            catch
+            {
+                returnString = "DB error";
             }
 
             return Json(returnString, JsonRequestBehavior.AllowGet);
@@ -225,28 +251,36 @@ namespace BakerySquared.Controllers
         [HttpGet]
         public ActionResult deskFill(string id, string userId)
         {
-            Employee modify = db.Employees.Find(userId);
-            Desk desk = db.Desks.Find(id);
             string returnString = "";
-            if (modify != null)
+            try
             {
-                if(modify.Desk != null)
-                {
-                    Desk remove = db.Desks.Find(modify.Desk);
-                    remove.Occupant = null;
-                    db.Entry(remove).State = System.Data.Entity.EntityState.Modified;
-                }
-                modify.Desk = id;
-                db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
-                desk.Occupant = modify.Name;
-                db.Entry(desk).State = System.Data.Entity.EntityState.Modified;
+                Employee modify = db.Employees.Find(userId);
+                Desk desk = db.Desks.Find(id);
 
-                db.SaveChanges();
-                returnString = "Completed";
+                if (modify != null)
+                {
+                    if (modify.Desk != null)
+                    {
+                        Desk remove = db.Desks.Find(modify.Desk);
+                        remove.Occupant = null;
+                        db.Entry(remove).State = System.Data.Entity.EntityState.Modified;
+                    }
+                    modify.Desk = id;
+                    db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
+                    desk.Occupant = modify.Name;
+                    db.Entry(desk).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+                    returnString = "Completed";
+                }
+                else
+                {
+                    returnString = "Employee not found";
+                }
             }
-            else
+            catch
             {
-                returnString = "Employee not found";
+                returnString = "DB error";
             }
 
             return Json(returnString, JsonRequestBehavior.AllowGet);

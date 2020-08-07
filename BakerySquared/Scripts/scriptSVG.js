@@ -120,13 +120,13 @@ function GetController() {
  */
 function setFill(currentID) {
     if (lastID && occupyFill(lastID)) {
-        $("#" + lastID).css("fill", "magenta");
+        $("#" + lastID).css("fill", "red");
     }
     else {
         $("#" + lastID).css("fill", "inherit");
     }
     lastID = currentID;
-    $("#" + currentID).css("fill", "red");
+    $("#" + currentID).css("fill", "magenta");
 }
 
 /*
@@ -316,7 +316,7 @@ function isOccupied(id){
             }
         },
         error: function (response) {
-            alert("Cannot determine Occupancy");
+            //alert("Cannot determine Occupancy");
         }
     });
 }
