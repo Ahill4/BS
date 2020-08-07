@@ -227,10 +227,6 @@ namespace BSDB.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string id)
         {
-            Desk d = new Desk();
-            d.Desk_Id = " <Your string> ";
-            db.Desks.Add(d);
-
             Desk desk = db.Desks.Find(id);
             db.Desks.Remove(desk);
             db.SaveChanges();
