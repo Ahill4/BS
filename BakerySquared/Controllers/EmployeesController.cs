@@ -281,13 +281,16 @@ namespace BSDB.Controllers
             Regex rx = new Regex("^(M|D|S)[0-9]{4}$",
                    RegexOptions.Compiled | RegexOptions.IgnoreCase);
             string url = this.Request.UrlReferrer.AbsolutePath; 
-
-            Match match = rx.Match(desk);
-            if (match.Success)
+            if(desk != null)
             {
-                char floor = desk[1];
-                url = "../Home/Floor" + floor + "?ID=" + desk;
+                Match match = rx.Match(desk);
+                if (match.Success)
+                {
+                    char floor = desk[1];
+                    url = "../Home/Floor" + floor + "?ID=" + desk;
+                }
             }
+
             return Redirect(url);
         }
 

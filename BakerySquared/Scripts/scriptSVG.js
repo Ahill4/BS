@@ -38,6 +38,7 @@ $(document).ready(function () {
     }
     $("*").each(function () {
         if (reD.test(this.id)) {
+            isOccupied(this.id);
             $("#" + this.id).on("click", GetController);
         }
     });
@@ -118,9 +119,14 @@ function GetController() {
  * Function is called to restore the last ID to its proper fill and set the fill of the new object to the red shown when clicked
  */
 function setFill(currentID) {
-    $("#" + lastID).css("fill", "inherit");
+    if (lastID && occupyFill(lastID)) {
+        $("#" + lastID).css("fill", "red");
+    }
+    else {
+        $("#" + lastID).css("fill", "inherit");
+    }
     lastID = currentID;
-    $("#" + currentID).css("fill", "red");
+    $("#" + currentID).css("fill", "magenta");
 }
 
 /*
@@ -149,16 +155,13 @@ function ajaxCall(ID) {
         dataType: "json",
         success: function (result) {
             if (result == "True") {
-                var add = confirm("Assign someone to this desk?");
+                var add = confirm("Not occupied. Assign someone to this desk?");
                 if (add) {
-                    var name = prompt("Name");
-                    var userId = prompt("Id");
-                    var title = prompt("Title");
-                    var phone = prompt("Phone");
-                    var email = prompt("Email");
-                    var manager = prompt("Manager");
-                    if (userId) {
-                        deskFill(name, ID, userId, title, phone, email, manager);
+
+                    let code1 = prompt("Enter Code 1")
+
+                    if (code1) {
+                        deskFill(ID, code1);
                     }
                 }
             }
@@ -254,7 +257,7 @@ function fillDB() {
  * function called when an registered user desires to fill a desk they clicked in view. 
  * uses information provided by user to add a user to DB and assign them to the desk
  */
-function deskFill(name, ID, userId, title, phone, email, manager) {
+function deskFill(ID, userId) {
     let urlPath;
     let path = window.location.pathname;
     if (path == "/") {
@@ -268,13 +271,8 @@ function deskFill(name, ID, userId, title, phone, email, manager) {
         type: "GET",
         url: urlPath,
         data: {
-            name: name,
             id: ID,
-            userId: userId,
-            title: title,
-            phone: phone,
-            email: email,
-            manager: manager
+            userId: userId
         },
         contentType: "application/json;charset=utf-8",
         dataType: "json",
@@ -285,4 +283,51 @@ function deskFill(name, ID, userId, title, phone, email, manager) {
             alert("error");
         }
     });
+}
+
+/*
+ * Function isOccupied
+ *
+ * function called on every location to check in the desk DB if the desk has an occupant. If so it
+ * adds a css class to the element that changes its color to purple to indicate that the desk is occupied
+ */
+function isOccupied(id){
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/isOccupied';
+    }
+    else {
+        urlPath = 'isOccupied'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {
+            id: id
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            if (result == "Occupied") {
+                var v = document.getElementById(id);
+                v.classList.add("occupied");
+            }
+        },
+        error: function (response) {
+            //alert("Cannot determine Occupancy");
+        }
+    });
+}
+
+/*
+ * function occupyFill
+ * 
+ * checks to see if a location contains the occupied css class. if it does return true else false.
+ * this allows the setfill to determine if it should inherit or fill with purple if it is occupied.
+ */
+function occupyFill(id) {
+    var v = document.getElementById(id);
+    return v.classList.contains("occupied");
 }
