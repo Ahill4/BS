@@ -120,7 +120,7 @@ function GetController() {
  */
 function setFill(currentID) {
     if (lastID && occupyFill(lastID)) {
-        $("#" + lastID).css("fill", "purple");
+        $("#" + lastID).css("fill", "magenta");
     }
     else {
         $("#" + lastID).css("fill", "inherit");
@@ -158,14 +158,10 @@ function ajaxCall(ID) {
                 var add = confirm("Not occupied. Assign someone to this desk?");
                 if (add) {
 
-                    let reCode1 = /([0-9]{9}|usd[0-9]{5}|[A-Z]{2}[a-z]{4})/
                     let code1 = prompt("Enter Code 1")
 
-                    if (reCode1.test(code1)) {
+                    if (code1) {
                         deskFill(ID, code1);
-                    }
-                    else if(code1){
-                        alert("Employee not found")
                     }
                 }
             }

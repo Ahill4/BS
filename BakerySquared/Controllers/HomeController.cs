@@ -230,6 +230,12 @@ namespace BakerySquared.Controllers
             string returnString = "";
             if (modify != null)
             {
+                if(modify.Desk != null)
+                {
+                    Desk remove = db.Desks.Find(modify.Desk);
+                    remove.Occupant = null;
+                    db.Entry(remove).State = System.Data.Entity.EntityState.Modified;
+                }
                 modify.Desk = id;
                 db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
                 desk.Occupant = modify.Name;
