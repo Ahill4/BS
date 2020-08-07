@@ -126,7 +126,7 @@ function setFill(currentID) {
         $("#" + lastID).css("fill", "inherit");
     }
     lastID = currentID;
-    $("#" + currentID).css("fill", "magenta");
+    $("#" + currentID).css("fill", "yellow");
 }
 
 /*
@@ -226,29 +226,32 @@ function showVal(a) {
  */
 function fillDB() {
     //checks if default page or regular floor page so that it can route to the right controller method
-    let urlPath;
-    let path = window.location.pathname;
-    if (path == "/") {
-        urlPath = 'Home/refillDB';
-    }
-    else {
-        urlPath = 'refillDB'
-    }
-    $.ajax({
-        type: "GET",
-        url: urlPath,
-        data: {
-            floor: currentFloor
-        },
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        success: function (result) {
-            alert(result)
-        },
-        error: function (response) {
-            alert("error");
+    var bool = confirm("This will remove all users from their desks on this floor. Would you like to continue?")
+    if (bool) {
+        let urlPath;
+        let path = window.location.pathname;
+        if (path == "/") {
+            urlPath = 'Home/refillDB';
         }
-    });
+        else {
+            urlPath = 'refillDB'
+        }
+        $.ajax({
+            type: "GET",
+            url: urlPath,
+            data: {
+                floor: currentFloor
+            },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                alert(result)
+            },
+            error: function (response) {
+                alert("error");
+            }
+        });
+    }
 }
 
 /*
