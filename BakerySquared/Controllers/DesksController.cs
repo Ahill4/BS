@@ -113,11 +113,6 @@ namespace BakerySquared.Controllers
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
-            //Desk desk = db.Desks.Find(id);
-            //Desk desk = _repository.Find(id);
-
-            //if (desk == null)
             else
             {
                 //Desk desk = db.Desks.Find(id);
@@ -157,10 +152,11 @@ namespace BakerySquared.Controllers
                 //db.Desks.Add(desk);
                 //db.SaveChanges();
 
+                // This if/else checks if the desk exists in the db. If it does, it doesn't create and tells the user.
                 if (!_repository.AlreadyExists(desk))
                 {
                     _repository.Create(desk);
-                    return RedirectToAction("Index");
+                    result = RedirectToAction("Index");
                 }
                 else
                 {
@@ -245,9 +241,6 @@ namespace BakerySquared.Controllers
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
-            //Desk desk = db.Desks.Find(id);
-
             else
             {
                 //Desk desk = db.Desks.Find(id);

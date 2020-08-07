@@ -19,7 +19,7 @@ namespace BakerySquared.Tests.Controllers
     public class DesksControllerTest
     {
         [TestMethod]
-        public void Index_ViewContains_IQueryableOfDesks()
+        public void Index_ViewContains_PagedListOfDesks()
         {
             // Arrange
             Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
