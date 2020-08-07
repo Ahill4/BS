@@ -143,10 +143,9 @@ namespace BSDB.Controllers
                     }
             }
 
-            int pageSize = 3;
+            int pageSize = 25;
             int pageNumber = (page ?? 1);
             return View(employees.ToPagedList(pageNumber, pageSize));
-            //return View(employees.ToList());
         }
 
         /// <summary>
@@ -302,7 +301,35 @@ namespace BSDB.Controllers
         {
             ActionResult result = null;
 
-            if (ModelState.IsValid)
+            Boolean b = true;
+            if (!employee.Desk.IsNullOrWhiteSpace())
+            {
+                Desk desk = db.Desks.Find(employee.Desk);
+                if (desk == null)
+                {
+                    b = false;
+                    ViewBag.message = "Desk not found.";
+                }
+                else
+                {
+                    if ((!desk.Occupant.IsNullOrWhiteSpace()) && (!desk.Occupant.Equals(employee.Name)))
+                    {
+                        b = false;
+                        ViewBag.message = "This desk is already occupied by " + desk.Occupant;
+                    }
+                    else
+                    {
+                        b = true;
+                        db.Desks.Remove(desk);
+                        db.SaveChanges();
+                        desk.Occupant = employee.Name;
+                        db.Desks.Add(desk);
+                        db.SaveChanges();
+                    }
+                }
+            }
+
+            if (ModelState.IsValid && b)
             {
                 db.Entry(employee).State = EntityState.Modified;
                 db.SaveChanges();

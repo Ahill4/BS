@@ -79,7 +79,6 @@ namespace BSDB.Controllers
             int pageSize = 20;
             int pageNumber = (page ?? 1);
             return View(desks.ToPagedList(pageNumber, pageSize));
-            //return View(employees.ToList());
         }
 
         /// <summary>
@@ -89,6 +88,7 @@ namespace BSDB.Controllers
         /// <returns></returns>
         public ActionResult Details(string id)
         {
+
             ActionResult result = null;
             if (id == null)
             {
