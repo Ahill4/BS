@@ -153,7 +153,7 @@ namespace BakerySquared.Controllers
                 }
             }
             db.SaveChanges();
-            return Json("Completed ", JsonRequestBehavior.AllowGet);
+            return Json("Completed", JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -191,32 +191,65 @@ namespace BakerySquared.Controllers
         }
 
         /// <summary>
+        /// called on every location to determine if the location is occupied. if it is it
+        /// changes the color of sent location
+        /// </summary>
+        /// <param name="id">Desk id given to check for occupancy</param>
+        /// <returns>returns string to determine if javascript should change item color</returns>
+        public ActionResult isOccupied(string id)
+        {
+            string returnString = "";
+            Desk desk = db.Desks.Find(id);
+            if(desk != null)
+            {
+                if(desk.Occupant == null)
+                {
+                    returnString = "Open";
+                }
+                else
+                {
+                    returnString = "Occupied";
+                }
+            }
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// if a user is logged in and they click an unoccupied desk they will be given the option to fill it
         /// they will then pass the user information and it will be added to the DB
         /// </summary>
-        /// <param name="name">name of person filling desk</param>
         /// <param name="id">desk id</param>
         /// <param name="userId">employee id</param>
-        /// <param name="title">employee title</param>
-        /// <param name="phone">employee phone</param>
-        /// <param name="email">employee email</param>
-        /// <param name="manager">employee manager</param>
         /// <returns>returns completed upon successful addition to DB</returns>
         [HttpGet]
-        public ActionResult deskFill(string name, string id, string userId, string title, string phone, string email, string manager)
+        public ActionResult deskFill(string id, string userId)
         {
-            Employee toAdd = new Employee();
-            toAdd.Desk = id;
-            toAdd.Name = name;
-            toAdd.Id = userId;
-            toAdd.Title = title;
-            toAdd.Phone = phone;
-            toAdd.Email = email;
-            toAdd.Manager = manager;
-            db.Employees.Add(toAdd);
+            Employee modify = db.Employees.Find(userId);
+            Desk desk = db.Desks.Find(id);
+            string returnString = "";
+            if (modify != null)
+            {
+                if(modify.Desk != null)
+                {
+                    Desk remove = db.Desks.Find(modify.Desk);
+                    remove.Occupant = null;
+                    db.Entry(remove).State = System.Data.Entity.EntityState.Modified;
+                }
+                modify.Desk = id;
+                db.Entry(modify).State = System.Data.Entity.EntityState.Modified;
+                desk.Occupant = modify.Name;
+                db.Entry(desk).State = System.Data.Entity.EntityState.Modified;
 
-            db.SaveChanges();
-            return Json("Completed ", JsonRequestBehavior.AllowGet);
+                db.SaveChanges();
+                returnString = "Completed";
+            }
+            else
+            {
+                returnString = "Employee not found";
+            }
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
         }
     }
 }
