@@ -18,6 +18,9 @@ namespace BakerySquared.Tests.Controllers
     [TestClass]
     public class DesksControllerTest
     {
+        /// <summary>
+        /// Tests that the Index() method produces a paged list of Desk objects in its view.
+        /// </summary>
         [TestMethod]
         public void Index_ViewContains_PagedListOfDesks()
         {
@@ -40,8 +43,11 @@ namespace BakerySquared.Tests.Controllers
             Assert.IsInstanceOfType(actual, typeof(PagedList<Desk>));
         }
 
+        /// <summary>
+        /// Tests that the Details() method produces a Desk object in it's view.
+        /// </summary>
         [TestMethod]
-        public void Details_ViewContains_DeskIdAndOccupant()
+        public void Details_ViewContains_DeskObject()
         {
             // Arrange
             Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
@@ -55,6 +61,48 @@ namespace BakerySquared.Tests.Controllers
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(Desk));
+        }
+
+        /// <summary>
+        /// Tests that the Create() method, when called to create a desk that does not already
+        /// exist in the database, redirects to a different action ("Index" action).
+        /// </summary>
+        [TestMethod]
+        public void Create_DeskDoesNotExist_RedirectsToAction()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.AlreadyExists(new Desk())).Returns(false);
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Create(new Desk());
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(RedirectToRouteResult));
+        }
+
+        /// <summary>
+        /// Tests that the Create() method, when called to create a desk that already exists
+        /// in the database, returns an Action Result (View Result with attempted Desk_Id and Occupant).
+        /// </summary>
+        [TestMethod]
+        public void Create_DeskAlreadyExist_ViewContainsDeskObject()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.AlreadyExists(new Desk())).Returns(true);
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Create(new Desk());
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
         }
     }
 
