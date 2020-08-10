@@ -134,7 +134,8 @@ namespace BakerySquared.Controllers
                                 }
                             case SignInStatus.Failure:
                                 {
-                                    rtnResult = View();
+                                    ModelState.AddModelError("", "Invalid login attempt.");
+                                    rtnResult = View(model);
                                     break;
                                 }
                             default:
@@ -148,7 +149,8 @@ namespace BakerySquared.Controllers
                 }
                 else
                 {
-                    rtnResult = View("Error");
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    rtnResult = View(model);
                 }               
             }
 
