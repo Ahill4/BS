@@ -427,7 +427,8 @@ namespace BakerySquared.Controllers
                     var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
                     if (result.Succeeded)
                     {
-                        rtnResult = RedirectToAction("Login", "Account");
+                        //rtnResult = RedirectToAction("Login", "Account");
+                        rtnResult = View("UserSetPasswordConfirmation");
                         AddErrors(result);
                     }
                     else

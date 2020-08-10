@@ -329,6 +329,7 @@
     <Content Include="Views\Home\Floor6.cshtml" />
     <Content Include="Views\Home\Floor7.cshtml" />
     <Content Include="Views\Shared\Forms.cshtml" />
+    <Content Include="Views\Account\UserSetPasswordConfirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
