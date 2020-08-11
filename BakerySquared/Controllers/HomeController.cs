@@ -141,15 +141,23 @@ namespace BakerySquared.Controllers
             try
             {
                 var desks = from e in db.Desks select e;
-
                 desks = desks.Where(e => e.Desk_Id.Contains(floor));
-
-                foreach (Desk e in desks)
+                
+                foreach (Desk d in desks)
                 {
-                    string id = e.Desk_Id;
-                    if (id.Length == 5 && id[1] == floor[0])
+                    string id = d.Desk_Id;
+                   
+                        if (id.Length == 5 && id[1] == floor[0])
                     {
-                        db.Desks.Remove(e);
+                        var employees = from e in db.Employees select e;
+                        employees = employees.Where(e => e.Desk.Contains(id));
+                        employees.ToList();
+                        foreach (Employee e in employees)
+                        {
+                            e.Desk = null;
+                            db.Entry(e).State = System.Data.Entity.EntityState.Modified;
+                        }
+                        db.Desks.Remove(d);
                     }
                 }
                 string ids = FileRegex(floor);
