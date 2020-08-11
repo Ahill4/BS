@@ -38,7 +38,11 @@ namespace BakerySquared.Tests.Controllers
 
             // Act
             var actual = (PagedList<Desk>)controller.Index("", "", "", 1).Model;
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 35bb0aea02bd6937295cd090e2c3cc7373faf7f2
             // Assert
             Assert.IsInstanceOfType(actual, typeof(PagedList<Desk>));
         }
@@ -89,7 +93,11 @@ namespace BakerySquared.Tests.Controllers
         /// in the database, returns an Action Result (View Result with attempted Desk_Id and Occupant).
         /// </summary>
         [TestMethod]
+<<<<<<< HEAD
         public void Create_DeskAlreadyExist_ReturnsActionResult()
+=======
+        public void Create_DeskAlreadyExist_ViewContainsDeskObject()
+>>>>>>> 35bb0aea02bd6937295cd090e2c3cc7373faf7f2
         {
             // Arrange
             Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
@@ -104,6 +112,7 @@ namespace BakerySquared.Tests.Controllers
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
         }
+<<<<<<< HEAD
 
         /// <summary>
         /// Tests that the Create() method, when called with an argument that is invalid such 
@@ -181,6 +190,8 @@ namespace BakerySquared.Tests.Controllers
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
         }
+=======
+>>>>>>> 35bb0aea02bd6937295cd090e2c3cc7373faf7f2
     }
 
 }
