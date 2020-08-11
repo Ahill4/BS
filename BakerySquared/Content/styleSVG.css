@@ -10,7 +10,7 @@
     *******************************************************************************/
 
 rect:hover, path:hover {
-    fill: magenta !important;
+    fill: yellow !important;
     cursor: pointer;
 }
 
