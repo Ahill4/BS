@@ -203,10 +203,14 @@
     <Compile Include="Models\Desk.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EFAccountRepository.cs" />
+    <Compile Include="Models\EFDesksRepository.cs" />
     <Compile Include="Models\Employee.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\IAccountRepository.cs" />
+    <Compile Include="Models\IDesksRepository.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Model1.Context.cs">
       <DependentUpon>Model1.Context.tt</DependentUpon>
@@ -325,6 +329,7 @@
     <Content Include="Views\Home\Floor6.cshtml" />
     <Content Include="Views\Home\Floor7.cshtml" />
     <Content Include="Views\Shared\Forms.cshtml" />
+    <Content Include="Views\Account\UserSetPasswordConfirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

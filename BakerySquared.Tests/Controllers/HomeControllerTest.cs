@@ -12,6 +12,6 @@ namespace BakerySquared.Tests.Controllers
     [TestClass]
     public class HomeControllerTest
     {
-
+  
     }
 }
