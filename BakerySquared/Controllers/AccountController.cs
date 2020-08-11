@@ -27,9 +27,11 @@ namespace BakerySquared.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private IAccountRepository _repository;
 
         public AccountController()
         {
+            this._repository = new EFAccountRepository();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -88,51 +90,71 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            ActionResult rtnResult;
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                rtnResult = View(model);
             }
-
-            // Require the user to have a confirmed email before they can log on.
-            var user = await UserManager.FindByEmailAsync(model.Email);
-            if (user != null)
+            else
             {
-                if (!await UserManager.IsEmailConfirmedAsync(user.Id))
+
+                // Require the user to have a confirmed email before they can log on.
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user != null)
                 {
-                    string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id);
+                    if (!await UserManager.IsEmailConfirmedAsync(user.Id))
+                    {
+                        string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id);
 
-                    ViewBag.errorMessage = "Email has not been confirmed.  A new confirmation email has been sent to you.";
-                    return View("Error");
+                        ViewBag.errorMessage = "Email has not been confirmed.  A new confirmation email has been sent to you.";
+                        rtnResult = View("Error");
+                    }
+                    else
+                    {
+                        // This doesn't count login failures towards account lockout
+                        // To enable password failures to trigger account lockout, change to shouldLockout: true
+                        var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                        switch (result)
+                        {
+                            case SignInStatus.Success:
+                                {
+                                    rtnResult = RedirectToLocal(returnUrl);
+                                    break;
+                                }
+                            case SignInStatus.LockedOut:
+                                {
+                                    rtnResult = View("Lockout");
+                                    break;
+                                }
+                            case SignInStatus.RequiresVerification:
+                                {
+                                    rtnResult = RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                                    break;
+                                }
+                            case SignInStatus.Failure:
+                                {
+                                    ModelState.AddModelError("", "Invalid login attempt.");
+                                    rtnResult = View(model);
+                                    break;
+                                }
+                            default:
+                                {
+                                    ModelState.AddModelError("", "Invalid login attempt.");
+                                    rtnResult = View(model);
+                                    break;
+                                }
+                        }
+                    }
                 }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    rtnResult = View(model);
+                }               
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    { 
-                        return RedirectToLocal(returnUrl);
-                    }
-                case SignInStatus.LockedOut:
-                    { 
-                        return View("Lockout");
-                    } 
-                case SignInStatus.RequiresVerification:
-                    { 
-                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                    }
-                case SignInStatus.Failure:
-                    {
-                        return View();
-                    }
-                default:
-                    {
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                        return View(model);
-                    }                
-            }
+            return rtnResult;
         }
 
         /// <summary>
@@ -150,12 +172,19 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
+            ActionResult rtnResult;
+
             // Require that the user has already logged in via username/password or external login
             if (!await SignInManager.HasBeenVerifiedAsync())
             {
-                return View("Error");
+                rtnResult = View("Error");
             }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            else
+            {
+                rtnResult = View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            }
+
+            return rtnResult;
         }
 
         /// <summary>
@@ -173,36 +202,46 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
         {
+            ActionResult rtnResult;
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                rtnResult = View(model);
+            }
+            else
+            {
+                // The following code protects for brute force attacks against the two factor codes. 
+                // If a user enters incorrect codes for a specified amount of time then the user account 
+                // will be locked out for a specified amount of time. 
+                // You can configure the account lockout settings in IdentityConfig
+                var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        {
+                            rtnResult = RedirectToLocal(model.ReturnUrl);
+                            break;
+                        }
+                    case SignInStatus.LockedOut:
+                        {
+                            rtnResult = View("Lockout");
+                            break;
+                        }
+                    case SignInStatus.Failure:
+                        {
+                            rtnResult = View();
+                            break;
+                        }
+                    default:
+                        {
+                            ModelState.AddModelError("", "Invalid code.");
+                            rtnResult = View(model);
+                            break;
+                        }
+                }
             }
 
-            // The following code protects for brute force attacks against the two factor codes. 
-            // If a user enters incorrect codes for a specified amount of time then the user account 
-            // will be locked out for a specified amount of time. 
-            // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    { 
-                        return RedirectToLocal(model.ReturnUrl);
-                    }
-                case SignInStatus.LockedOut:
-                    { 
-                        return View("Lockout");
-                    }
-                case SignInStatus.Failure:
-                    {
-                        return View();
-                    }
-                default:
-                    { 
-                        ModelState.AddModelError("", "Invalid code.");
-                        return View(model);
-                    }
-            }
+            return rtnResult;
         }
 
         /// <summary>
@@ -228,6 +267,8 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            ActionResult rtnResult;
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -245,13 +286,21 @@ namespace BakerySquared.Controllers
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     await UserManager.SendEmailAsync(user.Id, "Account Confirmation", callbackUrl);
 
-                    return View("ResendConfirmationEmail");
+                    rtnResult = View("ResendConfirmationEmail");
+                }
+                else
+                {
+                    rtnResult = View("Error");
                 }
                 AddErrors(result);
             }
+            else
+            {
+                rtnResult = View();
+            }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return rtnResult;
         }
 
         /// <summary>
@@ -277,6 +326,8 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResendConfirmationEmail(ResendConfirmationEmailViewModel model)
         {
+            ActionResult rtnResult;
+
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByEmailAsync(model.Email);
@@ -285,17 +336,26 @@ namespace BakerySquared.Controllers
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                     {
                         string callbackUrl = await SendEmailConfirmationTokenAsync(user.Id);
-
-                        return View();
+                        rtnResult = View();
+                    }
+                    else
+                    {
+                        rtnResult = View();
                     }
                 }
-
-                ViewBag.errorMessage = "Incorrect email.";
-                return View("Error");
+                else
+                {
+                    ViewBag.errorMessage = "Incorrect email.";
+                    rtnResult = View("Error");
+                }
+            }
+            else
+            {
+                rtnResult = View("Error");
             }
 
             // If we got this far, something failed, redisplay form
-            return View();
+            return rtnResult;
         }      
 
         /// <summary>
@@ -310,12 +370,19 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
+            ActionResult rtnResult;
+
             if (userId == null || code == null)
             {
-                return View("Error");
+                rtnResult = View("Error");
             }
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            else
+            {
+                var result = await UserManager.ConfirmEmailAsync(userId, code);
+                rtnResult = View(result.Succeeded ? "ConfirmEmail" : "Error");
+            }
+
+            return rtnResult;
         }
 
         /// <summary>
@@ -342,27 +409,41 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UserSetPassword(UserSetPasswordViewModel model)
         {
+            ActionResult rtnResult;
+
+
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("Error");
+                    rtnResult = View("Error");
                 }
-
-                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                model.Code = code;
-                var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-                if (result.Succeeded)
+                else
                 {
-                    return RedirectToAction("Login", "Account");
-                }
-                AddErrors(result);
+                    string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                    model.Code = code;
+                    var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                    if (result.Succeeded)
+                    {
+                        //rtnResult = RedirectToAction("Login", "Account");
+                        rtnResult = View("UserSetPasswordConfirmation");
+                        AddErrors(result);
+                    }
+                    else
+                    {
+                        rtnResult = View();
+                    }                   
+                }                
+            }
+            else
+            {
+                rtnResult = View();
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return rtnResult;
         }
 
         /// <summary>
@@ -389,23 +470,32 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
+            ActionResult rtnResult;
+
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    rtnResult = View("ForgotPasswordConfirmation");
                 }
+                else
+                {
+                    string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Password Reset", callbackUrl);
 
-                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                await UserManager.SendEmailAsync(user.Id, "Password Reset", callbackUrl);
-                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                    rtnResult = RedirectToAction("ForgotPasswordConfirmation", "Account");
+                }               
+            }
+            else
+            {
+                rtnResult = View("Error");
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return rtnResult;
         }
 
         /// <summary>
@@ -445,23 +535,36 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
+            ActionResult rtnResult;
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                rtnResult = View(model);
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
-            if (user == null)
+            else
             {
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
+                var user = await UserManager.FindByNameAsync(model.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    rtnResult = RedirectToAction("ResetPasswordConfirmation", "Account");
+                }
+                else
+                {
+                    var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("ResetPasswordConfirmation", "Account");
+                    }
+                    else
+                    {
+                        rtnResult = View("Error");
+                    }
+                    AddErrors(result);
+                }                
             }
-            var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-            AddErrors(result);
-            return View();
+            
+            return rtnResult;
         }
 
         /// <summary>
@@ -504,14 +607,22 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
+            ActionResult rtnResult;
+
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
             {
-                return View("Error");
+                rtnResult = View("Error");
             }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            else
+            {
+                var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
+                var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
+
+                rtnResult = View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
+            }
+
+            return rtnResult;
         }
 
         /// <summary>
@@ -529,17 +640,27 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SendCode(SendCodeViewModel model)
         {
+            ActionResult rtnResult;
+
             if (!ModelState.IsValid)
             {
-                return View();
+                rtnResult = View();
+            }
+            else
+            {
+                // Generate the token and send it
+                if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
+                {
+                    rtnResult = View("Error");
+                }
+                else
+                {
+                    rtnResult = RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+
+                }
             }
 
-            // Generate the token and send it
-            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
-            {
-                return View("Error");
-            }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return rtnResult;
         }
 
         /// <summary>
@@ -558,40 +679,51 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
+            ActionResult rtnResult;
+
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
-                return RedirectToAction("Login");
+                rtnResult = RedirectToAction("Login");
+            }
+            else
+            {
+                // Sign in the user with this external login provider if the user already has a login
+                var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        {
+                            rtnResult = RedirectToLocal(returnUrl);
+                            break;
+                        }
+                    case SignInStatus.LockedOut:
+                        {
+                            rtnResult = View("Lockout");
+                            break;
+                        }
+                    case SignInStatus.RequiresVerification:
+                        {
+                            rtnResult = RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+                            break;
+                        }
+                    case SignInStatus.Failure:
+                        {
+                            rtnResult = View("Error");
+                            break;
+                        }
+                    default:
+                        {
+                            // If the user does not have an account, then prompt the user to create an account
+                            ViewBag.ReturnUrl = returnUrl;
+                            ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+                            rtnResult = View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                            break;
+                        }
+                }
             }
 
-            // Sign in the user with this external login provider if the user already has a login
-            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    { 
-                        return RedirectToLocal(returnUrl);
-                    }
-                case SignInStatus.LockedOut:
-                    { 
-                        return View("Lockout");
-                    }
-                case SignInStatus.RequiresVerification:
-                    {
-                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
-                    }
-                case SignInStatus.Failure:
-                    {
-                        return View("Error");
-                    }
-                default:
-                    {
-                        // If the user does not have an account, then prompt the user to create an account
-                        ViewBag.ReturnUrl = returnUrl;
-                        ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                        return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
-                    }
-            }
+            return rtnResult;
         }
 
         /// <summary>
@@ -611,35 +743,54 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
         {
+            ActionResult rtnResult;
+
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Manage");
+                rtnResult = RedirectToAction("Index", "Manage");
             }
-
-            if (ModelState.IsValid)
+            else
             {
-                // Get the information about the user from the external login provider
-                var info = await AuthenticationManager.GetExternalLoginInfoAsync();
-                if (info == null)
+                if (ModelState.IsValid)
                 {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded)
+                    // Get the information about the user from the external login provider
+                    var info = await AuthenticationManager.GetExternalLoginInfoAsync();
+                    if (info == null)
                     {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToLocal(returnUrl);
+                        rtnResult = View("ExternalLoginFailure");
+                    }
+                    else
+                    {
+                        var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                        var result = await UserManager.CreateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            result = await UserManager.AddLoginAsync(user.Id, info.Login);
+                            if (result.Succeeded)
+                            {
+                                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                                rtnResult = RedirectToLocal(returnUrl);
+                            }
+                            else
+                            {
+                                rtnResult = View("Error");
+                            }
+                        }
+                        else
+                        {
+                            rtnResult = View(model);
+                        }
+                        AddErrors(result);
                     }
                 }
-                AddErrors(result);
+                else
+                {
+                    ViewBag.ReturnUrl = returnUrl;
+                    rtnResult = View(model);
+                }                
             }
 
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
+            return rtnResult;
         }
 
         /// <summary>
@@ -671,8 +822,9 @@ namespace BakerySquared.Controllers
         [AllowAnonymous]
         public ActionResult RegisteredAdmins()
         {
-            var context = ApplicationDbContext.Create();
-            var admins = context.Users.ToList();
+            //var context = ApplicationDbContext.Create();
+            //var admins = context.Users.ToList();
+            var admins = _repository.ToList();
 
             return View(admins);
         }
@@ -724,11 +876,18 @@ namespace BakerySquared.Controllers
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
+            ActionResult rtnResult;
+
             if (Url.IsLocalUrl(returnUrl))
             {
-                return Redirect(returnUrl);
+                rtnResult = Redirect(returnUrl);
             }
-            return RedirectToAction("Floor1", "Home");
+            else
+            {
+                return RedirectToAction("Floor1", "Home");
+            }
+
+            return rtnResult;
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult
