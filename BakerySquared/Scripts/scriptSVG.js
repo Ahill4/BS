@@ -51,6 +51,7 @@ $(document).ready(function () {
         setFill(ID);
         ajaxCall(ID);
     }
+    $(".preload").fadeOut(5000);
 });
 
 /*
