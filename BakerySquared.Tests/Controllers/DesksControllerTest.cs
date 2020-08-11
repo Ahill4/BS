@@ -38,7 +38,7 @@ namespace BakerySquared.Tests.Controllers
 
             // Act
             var actual = (PagedList<Desk>)controller.Index("", "", "", 1).Model;
-            
+
             // Assert
             Assert.IsInstanceOfType(actual, typeof(PagedList<Desk>));
         }
@@ -89,7 +89,7 @@ namespace BakerySquared.Tests.Controllers
         /// in the database, returns an Action Result (View Result with attempted Desk_Id and Occupant).
         /// </summary>
         [TestMethod]
-        public void Create_DeskAlreadyExist_ViewContainsDeskObject()
+        public void Create_DeskAlreadyExist_ReturnsActionResult()
         {
             // Arrange
             Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
@@ -100,6 +100,83 @@ namespace BakerySquared.Tests.Controllers
 
             // Act
             var actual = controller.Create(new Desk());
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        /// <summary>
+        /// Tests that the Create() method, when called with an argument that is invalid such 
+        /// as null object properties, returns an Action Result (View Result with desk object properties).
+        /// </summary>
+        [TestMethod]
+        public void Create_InvalidModelState_ReturnsActionResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Create(new Desk { Desk_Id = "", Occupant = "" });
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        /// <summary>
+        /// Tests that the Edit() method, when called with a null argument, returns an
+        /// HTTP Status Code Result (Bad Request).
+        /// </summary>
+        [TestMethod]
+        public void Edit_IdArgumentIsNull_ReturnsHTTPStatusCodeResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Edit("");
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(HttpStatusCodeResult));
+        }
+
+        //[TestMethod]
+        //public void Edit_DeskIsNull_ReturnsHTTPNotFound()
+        //{
+        //    // Arrange
+        //    Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+        //    mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "", Occupant = "" });
+
+        //    DesksController controller = new DesksController(mock.Object);
+
+        //    // Act
+        //    var actual = controller.Edit("");
+
+        //    // Assert
+        //    Assert.IsInstanceOfType(actual, typeof(HttpNotFoundResult));
+        //}
+
+        /// <summary>
+        /// Tests that the Edit() method, when desk used to call is successfully found,
+        /// returns an Action Result (View with Desk properties to edit).
+        /// </summary>
+        [TestMethod]
+        public void Edit_DeskToEditIsFound_ReturnsViewResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "D1000", Occupant = "Occupant1" });
+
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Edit("");
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
