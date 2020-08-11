@@ -118,7 +118,7 @@ namespace BakerySquared.Tests.Controllers
             DesksController controller = new DesksController(mock.Object);
 
             // Act
-            var actual = controller.Create(new Desk { Desk_Id = "", Occupant = "" });
+            var actual = controller.Create(new Desk { Desk_Id = null, Occupant = null });
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
@@ -205,6 +205,25 @@ namespace BakerySquared.Tests.Controllers
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(RedirectToRouteResult));
+        }
+
+        /// <summary>
+        /// Tests that the Edit() method (with Desk object parameter), when model state is 
+        /// invalid, and returns an Action Result (View with Desk object).
+        /// </summary>
+        [TestMethod]
+        public void Edit_ModelStateIsInvalid_RedirectsToAction()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Edit(new Desk { Desk_Id = null, Occupant = null });
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
         }
     }
 
