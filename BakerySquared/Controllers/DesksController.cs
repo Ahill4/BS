@@ -9,14 +9,15 @@
  *******************************************************************************/
 
 using System;
+using BakerySquared.Models;
+using BSDB.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Linq;
-using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using BSDB.Models;
+using System.Net;
+using System.Linq;
 using PagedList;
 
 namespace BakerySquared.Controllers
@@ -27,8 +28,20 @@ namespace BakerySquared.Controllers
     public class DesksController : Controller
     {
         private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
+        private IDesksRepository _repository;
 
-        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
+        public DesksController()
+        {
+            this._repository = new EFDesksRepository();
+        }
+
+        public DesksController(IDesksRepository repository)
+        {
+            _repository = repository;
+        }
+
+
+        public ViewResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
             ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
@@ -45,33 +58,33 @@ namespace BakerySquared.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var desks = from d in db.Desks select d;
+            var desks = _repository.ToQuery();
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                desks = desks.Where(d => d.Desk_Id.Contains(searchString) || d.Occupant.Contains(searchString));
+                desks = _repository.Contains(desks, searchString);
             }
 
             switch (sortOrder)
             {
                 case "occupant_desc":
                     {
-                        desks = desks.OrderByDescending(d => d.Desk_Id);
+                        desks = _repository.OrderByDescendingId(desks);
                         break;
                     }
                 case "occu":
                     {
-                        desks = desks.OrderBy(d => d.Occupant);
+                        desks = _repository.OrderByAscendingOccupant(desks);
                         break;
                     }
                 case "occu_desc":
                     {
-                        desks = desks.OrderByDescending(d => d.Occupant);
+                        desks = _repository.OrderByDescendingOccupant(desks);
                         break;
                     }
                 default: //desc Desk_Id
                     {
-                        desks = desks.OrderBy(d => d.Desk_Id);
+                        desks = _repository.OrderByAscendingId(desks);
                         break;
                     }
             }
@@ -86,20 +99,23 @@ namespace BakerySquared.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Details(string id)
+        public ViewResult Details(string id)
         {
+            ViewResult result;
 
-            ActionResult result = null;
             if (id == null)
             {
-                result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                ModelState.AddModelError("", "Desk Id not found.");
+                result = View();
             }
             else
             {
-                Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
-                    result = HttpNotFound();
+                    ModelState.AddModelError("", "Desk Id not found.");
+                    result = View();
                 }
                 else
                 {
@@ -124,13 +140,21 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Desk_Id,Occupant")] Desk desk)
         {
-            ActionResult result = null;
+            ActionResult result;
 
             if (ModelState.IsValid)
             {
-                db.Desks.Add(desk);
-                db.SaveChanges();
-                result = RedirectToAction("Index");
+                // This if/else checks if the desk exists in the db. If it does, it doesn't create and tells the user.
+                if (!_repository.AlreadyExists(desk))
+                {
+                    _repository.Create(desk);
+                    result = RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Desk already exists.");
+                    result = View(desk);
+                }
             }
             else
             {
@@ -147,14 +171,16 @@ namespace BakerySquared.Controllers
         /// <returns></returns>
         public ActionResult Edit(string id)
         {
-            ActionResult result = null;
+            ActionResult result;
+
             if (id == null)
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             else
             {
-                Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
                     result = HttpNotFound();
@@ -164,9 +190,6 @@ namespace BakerySquared.Controllers
                     result = View(desk);
                 }
             }
-
-
-
             return result;
         }
 
@@ -179,12 +202,12 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Desk_Id,Occupant")] Desk desk)
         {
-            ActionResult result = null;
+            ActionResult result;
 
             if (ModelState.IsValid)
             {
-                db.Entry(desk).State = EntityState.Modified;
-                db.SaveChanges();
+                _repository.Edit(desk);
+
                 result = RedirectToAction("Index");
             }
             else
@@ -202,14 +225,15 @@ namespace BakerySquared.Controllers
         /// <returns></returns>
         public ActionResult Delete(string id)
         {
-            ActionResult result = null;
+            ActionResult result;
             if (id == null)
             {
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             else
             {
-                Desk desk = db.Desks.Find(id);
+                Desk desk = _repository.Find(id);
+
                 if (desk == null)
                 {
                     result = HttpNotFound();
@@ -227,9 +251,8 @@ namespace BakerySquared.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string id)
         {
-            Desk desk = db.Desks.Find(id);
-            db.Desks.Remove(desk);
-            db.SaveChanges();
+            _repository.Delete(id);
+
             return RedirectToAction("Index");
         }
 
