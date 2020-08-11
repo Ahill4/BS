@@ -125,8 +125,8 @@ namespace BakerySquared.Tests.Controllers
         }
 
         /// <summary>
-        /// Tests that the Edit() method, when called with a null argument, returns an
-        /// HTTP Status Code Result (Bad Request).
+        /// Tests that the Edit() method (with string parameter), when called with a
+        /// null argument, returns an HTTP Status Code Result (Bad Request).
         /// </summary>
         [TestMethod]
         public void Edit_IdArgumentIsNull_ReturnsHTTPStatusCodeResult()
@@ -137,28 +137,33 @@ namespace BakerySquared.Tests.Controllers
             DesksController controller = new DesksController(mock.Object);
 
             // Act
-            var actual = controller.Edit("");
+            string test = null;
+            var actual = controller.Edit(test);
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(HttpStatusCodeResult));
         }
 
-        //[TestMethod]
-        //public void Edit_DeskIsNull_ReturnsHTTPNotFound()
-        //{
-        //    // Arrange
-        //    Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+        /// <summary>
+        /// Tests that the Edit() method (with string parameter), when desk id to edit is 
+        /// found to be null, returns an Action Result (View("Error")).
+        /// </summary>
+        [TestMethod]
+        public void Edit_DeskIsNull_ReturnsHTTPNotFound()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
 
-        //    mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "", Occupant = "" });
+            mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "", Occupant = "" });
 
-        //    DesksController controller = new DesksController(mock.Object);
+            DesksController controller = new DesksController(mock.Object);
 
-        //    // Act
-        //    var actual = controller.Edit("");
+            // Act
+            var actual = controller.Edit("");
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(actual, typeof(HttpNotFoundResult));
-        //}
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
 
         /// <summary>
         /// Tests that the Edit() method (with string parameter), when desk used to call
@@ -181,6 +186,10 @@ namespace BakerySquared.Tests.Controllers
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
         }
 
+        /// <summary>
+        /// Tests that the Edit() method (with Desk object parameter), when model state is 
+        /// valid, the Desk in db is edited, and returns Redirect to Route Result (Redirect to "Index" action).
+        /// </summary>
         [TestMethod]
         public void Edit_ModelStateIsValid_RedirectsToAction()
         {
