@@ -161,8 +161,8 @@ namespace BakerySquared.Tests.Controllers
         //}
 
         /// <summary>
-        /// Tests that the Edit() method, when desk used to call is successfully found,
-        /// returns an Action Result (View with Desk properties to edit).
+        /// Tests that the Edit() method (with string parameter), when desk used to call
+        /// is successfully found, returns an Action Result (View with Desk properties to edit).
         /// </summary>
         [TestMethod]
         public void Edit_DeskToEditIsFound_ReturnsViewResult()
@@ -172,7 +172,6 @@ namespace BakerySquared.Tests.Controllers
 
             mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "D1000", Occupant = "Occupant1" });
 
-
             DesksController controller = new DesksController(mock.Object);
 
             // Act
@@ -180,6 +179,23 @@ namespace BakerySquared.Tests.Controllers
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        [TestMethod]
+        public void Edit_ModelStateIsValid_RedirectsToAction()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.Edit(new Desk())).Verifiable();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Edit(new Desk { Desk_Id = "D1000", Occupant = "Occupant1" });
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(RedirectToRouteResult));
         }
     }
 
