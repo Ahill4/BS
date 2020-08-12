@@ -312,10 +312,12 @@ namespace BakerySquared.Controllers
         {
             ActionResult result = null;
 
+            String name = employee.Name;
+
             Boolean b = true;
             if (!employee.Desk.IsNullOrWhiteSpace())
             {
-                Desk desk = db.Desks.Find(employee.Desk);
+                Desk desk = db.Desks.Find(employee.Desk.Trim());
                 if (desk == null)
                 {
                     b = false;
@@ -333,7 +335,7 @@ namespace BakerySquared.Controllers
                         b = true;
                         db.Desks.Remove(desk);
                         db.SaveChanges();
-                        desk.Occupant = employee.Name;
+                        desk.Occupant = name;
                         db.Desks.Add(desk);
                         db.SaveChanges();
                     }
@@ -343,13 +345,16 @@ namespace BakerySquared.Controllers
             {
                 foreach (Desk d in db.Desks.ToArray())
                 {
-                    if (d.Occupant.Trim().Equals(employee.Name.Trim()))
+                    if(!d.Occupant.IsNullOrWhiteSpace())
                     {
-                        d.Occupant = null;
-                        db.Desks.Remove(d);
-                        db.SaveChanges();
-                        db.Desks.Add(d);
-                    }
+                        if (d.Occupant.Trim().Equals(employee.Name.Trim()))
+                        {
+                            d.Occupant = null;
+                            db.Desks.Remove(d);
+                            db.SaveChanges();
+                            db.Desks.Add(d);
+                        }
+                    }                   
                 }
             }
 
