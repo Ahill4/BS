@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BSDB.Models
+namespace BakerySquared.Models
 {
     using System;
     using System.Collections.Generic;

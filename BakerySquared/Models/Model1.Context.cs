@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BSDB.Models
+namespace BakerySquared.Models
 {
     using System;
     using System.Data.Entity;
@@ -27,5 +27,6 @@ namespace BSDB.Models
     
         public virtual DbSet<Desk> Desks { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
     }
 }

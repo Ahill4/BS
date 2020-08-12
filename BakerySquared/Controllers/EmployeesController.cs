@@ -19,7 +19,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
 using BakerySquared.Controllers;
-using BSDB.Models;
+//using BSDB.Models;
+using BakerySquared.Models;
 using Microsoft.Ajax.Utilities;
 using PagedList;
 
@@ -331,6 +332,19 @@ namespace BSDB.Controllers
                     }
                 }
             }
+            else //--------------------TEST THIS--------------------
+            {
+                foreach (Desk d in db.Desks.ToArray())
+                {
+                    if (d.Occupant.Trim().Equals(employee.Name.Trim()))
+                    {
+                        d.Occupant = null;
+                        db.Desks.Remove(d);
+                        db.SaveChanges();
+                        db.Desks.Add(d);
+                    }
+                }
+            }
 
             if (ModelState.IsValid && b)
             {
@@ -383,6 +397,16 @@ namespace BSDB.Controllers
             Employee employee = db.Employees.Find(id);
             db.Employees.Remove(employee);
             db.SaveChanges();
+            if (!employee.Desk.IsNullOrWhiteSpace())
+            {
+                Desk d = db.Desks.Find(employee.Desk);
+                d.Occupant = null;
+                db.Desks.Remove(d);
+                db.SaveChanges();
+                db.Desks.Add(d);
+                db.SaveChanges();
+            }
+            
             return RedirectToAction("Index");
         }
 
