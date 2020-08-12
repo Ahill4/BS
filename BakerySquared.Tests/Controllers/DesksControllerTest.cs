@@ -154,7 +154,8 @@ namespace BakerySquared.Tests.Controllers
             // Arrange
             Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
 
-            mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "", Occupant = "" });
+            Desk deskNull = null;
+            mock.Setup(d => d.Find("")).Returns(deskNull);
 
             DesksController controller = new DesksController(mock.Object);
 
@@ -224,6 +225,92 @@ namespace BakerySquared.Tests.Controllers
 
             // Assert
             Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        /// <summary>
+        /// Tests that the Delete(), when passed a null id argument, returns an 
+        /// HTTP Status Code Result (HttpStatusCode.BadRequest).
+        /// </summary>
+        [TestMethod]
+        public void Delete_IdIsNull_ReturnsHTTPBadRequest()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            string deleteNull = null;
+
+
+            // Act
+            var actual = controller.Delete(deleteNull);
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(HttpStatusCodeResult));
+        }
+
+        /// <summary>
+        /// Tests that the Delete(), when desk to be deleted is found to be null, 
+        /// returns an Action Result (View Result View("Error")).
+        /// </summary>
+        [TestMethod]
+        public void Delete_DeskFoundIsNull_ReturnsActionResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            Desk deskNull = null;
+            mock.Setup(d => d.Find("")).Returns(deskNull);
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Delete("");
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        /// <summary>
+        /// Tests that the Delete(), when desk to be deleted is found in database, 
+        /// returns an Action Result (View with Desk object properties).
+        /// </summary>
+        [TestMethod]
+        public void Delete_DeskIsFound_ReturnsActionResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.Find("")).Returns(new Desk { Desk_Id = "D1000", Occupant = "Occupant1" });
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.Delete("");
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(ActionResult));
+        }
+
+        /// <summary>
+        /// Tests that the Delete(), when desk to be deleted is found in database, 
+        /// returns an Action Result (View with Desk object properties).
+        /// </summary>
+        [TestMethod]
+        public void DeleteConfirmed_ReturnsRedirectToRouteResult()
+        {
+            // Arrange
+            Mock<IDesksRepository> mock = new Mock<IDesksRepository>();
+
+            mock.Setup(d => d.Delete("")).Verifiable();
+
+            DesksController controller = new DesksController(mock.Object);
+
+            // Act
+            var actual = controller.DeleteConfirmed("");
+
+            // Assert
+            Assert.IsInstanceOfType(actual, typeof(RedirectToRouteResult));
         }
     }
 

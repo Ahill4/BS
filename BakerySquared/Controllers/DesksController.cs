@@ -183,6 +183,7 @@ namespace BakerySquared.Controllers
 
                 if (desk == null)
                 {
+                    ViewBag.errorMessage = "Desk not found.";
                     result = View("Error");
                 }
                 else
@@ -236,7 +237,8 @@ namespace BakerySquared.Controllers
 
                 if (desk == null)
                 {
-                    result = HttpNotFound();
+                    ViewBag.errorMessage = "Desk not found.";
+                    result = View("Error");
                 }
                 else
                 {
