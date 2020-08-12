@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -24,7 +25,7 @@ using BakerySquared.Models;
 using Microsoft.Ajax.Utilities;
 using PagedList;
 
-namespace BSDB.Controllers
+namespace BakerySquared.Controllers
 {
     /// <summary>
     /// Controller for the Employee table of the database
@@ -196,14 +197,17 @@ namespace BSDB.Controllers
             Boolean deskFound = false;
             Boolean deskEmpty = true;
 
-            Desk d = new Desk();
-
             if (employee.Desk.IsNullOrWhiteSpace())
             {
+                result = RedirectToAction("Index");
                 deskFound = true;
+                db.Employees.Add(employee);
+                db.SaveChanges();
             }
             else
             {
+                Desk d = new Desk();
+
                 d = db.Desks.Find(employee.Desk);
 
                 if (d == null)
@@ -220,23 +224,26 @@ namespace BSDB.Controllers
                         ViewBag.message = "This desk is already occupied by " + d.Occupant;
                     }
                 }
+
+                if (ModelState.IsValid && deskFound == true && deskEmpty == true)
+                {
+
+                    db.Employees.Add(employee);
+                    db.Desks.Attach(d);
+                    db.Desks.Remove(d);
+                    db.SaveChanges();
+                    d.Occupant = employee.Name;
+                    db.Desks.Add(d);
+                    db.SaveChanges();
+                    result = RedirectToAction("Index");
+                }
+                else
+                {
+                    result = View(employee);
+                }
             }
             
-            if (ModelState.IsValid && deskFound == true && deskEmpty == true)
-            {
-                db.Employees.Add(employee);
-                db.Desks.Remove(d);
-                db.SaveChanges();
-                d.Occupant = employee.Name;
-                db.Desks.Add(d);
-                db.SaveChanges();
-                result = RedirectToAction("Index");
-
-            }
-            else
-            {
-                result = View(employee);
-            }
+            
 
             return result;
         }

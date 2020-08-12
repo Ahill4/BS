@@ -5,19 +5,11 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="BakerySquareDirectoryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'BakerySquareDirectory.dbo.AspNetUsers' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="AspNetUsers">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="EmailConfirmed" />
-            <PropertyRef Name="PhoneConfirmed" />
-            <PropertyRef Name="TwoFactorEnabled" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="UserName" />
           </Key>
-          <Property Name="Id" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Id" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Email" Type="nvarchar(max)" />
           <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
           <Property Name="PasswordHash" Type="nvarchar(max)" />
@@ -32,13 +24,11 @@ warning 6002: The table/view 'BakerySquareDirectory.dbo.AspNetUsers' does not ha
           <Property Name="FirstName" Type="nvarchar(max)" />
           <Property Name="LastName" Type="nvarchar(max)" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'BakerySquareDirectory.dbo.Desk' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Desk">
           <Key>
             <PropertyRef Name="Desk Id" />
           </Key>
-          <Property Name="Desk Id" Type="varchar(max)" Nullable="false" />
+          <Property Name="Desk Id" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Occupant" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Employee">
@@ -54,31 +44,9 @@ warning 6002: The table/view 'BakerySquareDirectory.dbo.Desk' does not have a pr
           <Property Name="Manager" Type="varchar(max)" />
         </EntityType>
         <EntityContainer Name="BakerySquareDirectoryModelStoreContainer">
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Desk" EntityType="Self.Desk" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [AspNetUsers].[Id] AS [Id], 
-    [AspNetUsers].[Email] AS [Email], 
-    [AspNetUsers].[EmailConfirmed] AS [EmailConfirmed], 
-    [AspNetUsers].[PasswordHash] AS [PasswordHash], 
-    [AspNetUsers].[SecurityStamp] AS [SecurityStamp], 
-    [AspNetUsers].[Phone] AS [Phone], 
-    [AspNetUsers].[PhoneConfirmed] AS [PhoneConfirmed], 
-    [AspNetUsers].[TwoFactorEnabled] AS [TwoFactorEnabled], 
-    [AspNetUsers].[LockoutEndDateUtc] AS [LockoutEndDateUtc], 
-    [AspNetUsers].[LockoutEnabled] AS [LockoutEnabled], 
-    [AspNetUsers].[AccessFailedCount] AS [AccessFailedCount], 
-    [AspNetUsers].[UserName] AS [UserName], 
-    [AspNetUsers].[FirstName] AS [FirstName], 
-    [AspNetUsers].[LastName] AS [LastName]
-    FROM [dbo].[AspNetUsers] AS [AspNetUsers]</DefiningQuery>
-          </EntitySet>
-          <EntitySet Name="Desk" EntityType="Self.Desk" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [Desk].[Desk Id] AS [Desk Id], 
-    [Desk].[Occupant] AS [Occupant]
-    FROM [dbo].[Desk] AS [Desk]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -88,7 +56,7 @@ warning 6002: The table/view 'BakerySquareDirectory.dbo.Desk' does not have a pr
           <Key>
             <PropertyRef Name="Desk_Id" />
           </Key>
-          <Property Name="Desk_Id" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Desk_Id" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Occupant" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Employee">
@@ -111,14 +79,8 @@ warning 6002: The table/view 'BakerySquareDirectory.dbo.Desk' does not have a pr
         <EntityType Name="AspNetUser">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="EmailConfirmed" />
-            <PropertyRef Name="PhoneConfirmed" />
-            <PropertyRef Name="TwoFactorEnabled" />
-            <PropertyRef Name="LockoutEnabled" />
-            <PropertyRef Name="AccessFailedCount" />
-            <PropertyRef Name="UserName" />
           </Key>
-          <Property Name="Id" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
           <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
