@@ -34,6 +34,8 @@ namespace BakerySquared.Controllers
     {
         private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
 
+        private static String prevDesk = "";
+
         /// <summary>
         /// handles the search and sort functionality
         /// </summary>
@@ -256,6 +258,7 @@ namespace BakerySquared.Controllers
         public ActionResult Edit(string id)
         {
             ActionResult result = null;
+            prevDesk = "";
 
             if (id == null)
             {
@@ -270,6 +273,7 @@ namespace BakerySquared.Controllers
                 }
                 else
                 {
+                    prevDesk = employee.Desk;
                     result = View(employee);
                 }
             }
@@ -369,6 +373,25 @@ namespace BakerySquared.Controllers
                 result = View(employee);
             }
 
+            if(prevDesk!=null)
+            {
+                if (!prevDesk.Equals(employee.Desk))
+                {
+                    Desk prevD = new Desk();
+                    Desk newDesk = new Desk();
+                    prevD = db.Desks.Find(prevDesk);
+                    newDesk = db.Desks.Find(employee.Desk);
+                    if (newDesk != null)
+                    {
+                        db.Desks.Remove(prevD);
+                        db.SaveChanges();
+                        prevD.Occupant = null;
+                        db.Desks.Add(prevD);
+                        db.SaveChanges();
+                    }
+                }
+            }
+            
             return result;
         }
 
