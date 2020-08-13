@@ -297,9 +297,49 @@ namespace BakerySquared.Controllers
             {
                 return View(model);
             }
+
             var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
             if (result.Succeeded)
             {
+                // Initiate variables to check for valid passwords
+                char[] pwTest = model.NewPassword.ToCharArray();
+                string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                string lowLetters = capLetters.ToLower();
+                string symbols = "!@#$%^&*";
+                string numbers = "1234567890";
+                int capCount = 0;
+                int lowCount = 0;
+                int symbolCount = 0;
+                int numberCount = 0;
+
+                // Increment counters for all necessary characters
+                for (int i = 0; i < pwTest.Length; i++)
+                {
+                    if (capLetters.Contains(pwTest[i]))
+                    {
+                        capCount++;
+                    }
+                    if (lowLetters.Contains(pwTest[i]))
+                    {
+                        lowCount++;
+                    }
+                    if (symbols.Contains(pwTest[i]))
+                    {
+                        symbolCount++;
+                    }
+                    if (numbers.Contains(pwTest[i]))
+                    {
+                        numberCount++;
+                    }
+                }
+
+                // If any counter is == 0, password is invalid
+                if (capCount == 0 || lowCount == 0 || symbolCount == 0 || numberCount == 0)
+                {
+                    ModelState.AddModelError("", "Passwords must have at least one non letter or digit character. Passwords must have at least one digit ('0'-'9'). Passwords must have at least one uppercase ('A'-'Z').");
+                    return View(model);
+                }
+
                 var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                 if (user != null)
                 {
@@ -336,6 +376,45 @@ namespace BakerySquared.Controllers
                 var result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
                 if (result.Succeeded)
                 {
+                    // Initiate variables to check for valid passwords
+                    char[] pwTest = model.NewPassword.ToCharArray();
+                    string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    string lowLetters = capLetters.ToLower();
+                    string symbols = "!@#$%^&*";
+                    string numbers = "1234567890";
+                    int capCount = 0;
+                    int lowCount = 0;
+                    int symbolCount = 0;
+                    int numberCount = 0;
+
+                    // Increment counters for all necessary characters
+                    for (int i = 0; i < pwTest.Length; i++)
+                    {
+                        if (capLetters.Contains(pwTest[i]))
+                        {
+                            capCount++;
+                        }
+                        if (lowLetters.Contains(pwTest[i]))
+                        {
+                            lowCount++;
+                        }
+                        if (symbols.Contains(pwTest[i]))
+                        {
+                            symbolCount++;
+                        }
+                        if (numbers.Contains(pwTest[i]))
+                        {
+                            numberCount++;
+                        }
+                    }
+
+                    // If any counter is == 0, password is invalid
+                    if (capCount == 0 || lowCount == 0 || symbolCount == 0 || numberCount == 0)
+                    {
+                        ModelState.AddModelError("", "Passwords must have at least one non letter or digit character. Passwords must have at least one digit ('0'-'9'). Passwords must have at least one uppercase ('A'-'Z').");
+                        return View(model);
+                    }
+
                     var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                     if (user != null)
                     {
