@@ -115,8 +115,7 @@ namespace BakerySquared.Controllers
                     }
                     else
                     {
-                        //returnString = "Not Occupied";
-                        returnString = "True";
+                        returnString = "Not Occupied";
                     }
                 }
             }
@@ -233,8 +232,7 @@ namespace BakerySquared.Controllers
             }
             else
             {
-                //returnString = "False";
-                returnString = "True";
+                returnString = "False";
             }
             return Json(returnString, JsonRequestBehavior.AllowGet);
         }
