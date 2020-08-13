@@ -11,6 +11,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -271,6 +272,53 @@ namespace BakerySquared.Controllers
 
             if (ModelState.IsValid)
             {
+                // Initiate variables to check for valid passwords
+                char[] pwTest = model.Password.ToCharArray();
+                string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                string lowLetters = capLetters.ToLower();
+                string symbols = "!@#$%^&*";
+                string numbers = "1234567890";
+                int capCount = 0;
+                int lowCount = 0;
+                int symbolCount = 0;
+                int numberCount = 0;
+
+                // Increment counters for all necessary characters
+                for(int i = 0; i < pwTest.Length; i++)
+                {
+                    if(capLetters.Contains(pwTest[i]))
+                    {
+                        capCount++;
+                    }
+                    if (lowLetters.Contains(pwTest[i]))
+                    {
+                        lowCount++;
+                    }
+                    if(symbols.Contains(pwTest[i]))
+                    {
+                        symbolCount++;
+                    }
+                    if(numbers.Contains(pwTest[i]))
+                    {
+                        numberCount++;
+                    }
+                }
+
+                // If any counter is == 0, password is invalid
+                if(capCount == 0 || lowCount == 0 || symbolCount == 0 || numberCount == 0)
+                {
+                    ModelState.AddModelError("", "Passwords must have at least one non letter or digit character. Passwords must have at least one digit ('0'-'9'). Passwords must have at least one uppercase ('A'-'Z').");
+                    return View(model);
+                }
+
+                // Check if email is already in database
+                var userTest = await UserManager.FindByEmailAsync(model.Email);
+                if(userTest != null)
+                {
+                    ModelState.AddModelError("", "Email is already registered");
+                    return View(model);
+                }
+
                 var user = new ApplicationUser
                 {
                     FirstName = model.FirstName,
@@ -414,6 +462,45 @@ namespace BakerySquared.Controllers
 
             if (ModelState.IsValid)
             {
+                // Initiate variables to check for valid passwords
+                char[] pwTest = model.Password.ToCharArray();
+                string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                string lowLetters = capLetters.ToLower();
+                string symbols = "!@#$%^&*";
+                string numbers = "1234567890";
+                int capCount = 0;
+                int lowCount = 0;
+                int symbolCount = 0;
+                int numberCount = 0;
+
+                // Increment counters for all necessary characters
+                for (int i = 0; i < pwTest.Length; i++)
+                {
+                    if (capLetters.Contains(pwTest[i]))
+                    {
+                        capCount++;
+                    }
+                    if (lowLetters.Contains(pwTest[i]))
+                    {
+                        lowCount++;
+                    }
+                    if (symbols.Contains(pwTest[i]))
+                    {
+                        symbolCount++;
+                    }
+                    if (numbers.Contains(pwTest[i]))
+                    {
+                        numberCount++;
+                    }
+                }
+
+                // If any counter is == 0, password is invalid
+                if (capCount == 0 || lowCount == 0 || symbolCount == 0 || numberCount == 0)
+                {
+                    ModelState.AddModelError("", "Passwords must have at least one non letter or digit character. Passwords must have at least one digit ('0'-'9'). Passwords must have at least one uppercase ('A'-'Z').");
+                    return View(model);
+                }
+
                 var user = await UserManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
@@ -543,6 +630,45 @@ namespace BakerySquared.Controllers
             }
             else
             {
+                // Initiate variables to check for valid passwords
+                char[] pwTest = model.Password.ToCharArray();
+                string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                string lowLetters = capLetters.ToLower();
+                string symbols = "!@#$%^&*";
+                string numbers = "1234567890";
+                int capCount = 0;
+                int lowCount = 0;
+                int symbolCount = 0;
+                int numberCount = 0;
+
+                // Increment counters for all necessary characters
+                for (int i = 0; i < pwTest.Length; i++)
+                {
+                    if (capLetters.Contains(pwTest[i]))
+                    {
+                        capCount++;
+                    }
+                    if (lowLetters.Contains(pwTest[i]))
+                    {
+                        lowCount++;
+                    }
+                    if (symbols.Contains(pwTest[i]))
+                    {
+                        symbolCount++;
+                    }
+                    if (numbers.Contains(pwTest[i]))
+                    {
+                        numberCount++;
+                    }
+                }
+
+                // If any counter is == 0, password is invalid
+                if (capCount == 0 || lowCount == 0 || symbolCount == 0 || numberCount == 0)
+                {
+                    ModelState.AddModelError("", "Passwords must have at least one non letter or digit character. Passwords must have at least one digit ('0'-'9'). Passwords must have at least one uppercase ('A'-'Z').");
+                    return View(model);
+                }
+
                 var user = await UserManager.FindByNameAsync(model.Email);
                 if (user == null)
                 {
