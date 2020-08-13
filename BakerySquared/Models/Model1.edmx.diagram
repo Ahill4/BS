@@ -7,6 +7,7 @@
       <Diagram DiagramId="16864743fa63447997783e651c853221" Name="Diagram1">
         <EntityTypeShape EntityType="BakerySquareDirectoryModel.Desk" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="BakerySquareDirectoryModel.Employee" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="BakerySquareDirectoryModel.AspNetUser" Width="1.5" PointX="0.625" PointY="2.5" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
