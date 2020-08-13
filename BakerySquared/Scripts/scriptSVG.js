@@ -154,20 +154,62 @@ function ajaxCall(ID) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
-            if (result == "True") {
-                var add = confirm("Not occupied. Assign someone to this desk?");
-                if (add) {
+            onSuccess(result, ID);
+        },
+        error: function (response) {
+            alert('error');
+        }
+    });
+}
 
-                    let code1 = prompt("Enter Code 1")
+/*
+ * function onSuccess
+ * 
+ * called on ajaxCall success to assign a desk or send to isAuth to determine if user has permission to remove occupant
+ */
+function onSuccess(result, ID) {
+    if (result == "True") {
+        var add = confirm("Not occupied. Assign someone to this desk?");
+        if (add) {
+            let code1 = prompt("Enter Code 1")
 
-                    if (code1) {
-                        deskFill(ID, code1);
-                    }
-                }
+            if (code1) {
+                deskFill(ID, code1);
             }
-            else {
-                alert(result);
-            }
+        }
+    }
+    else {
+        isAuth(result, ID)
+    }
+}
+
+/*
+ * function removeOccupant
+ * 
+ * removes the desk from the assigned user and clears the desk DB for that desk
+ */
+function removeOccupant(ID) {
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/RemoveOccupant';
+    }
+    else {
+        urlPath = 'RemoveOccupant'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {
+            id: ID
+        },
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            var v = document.getElementById(id);
+            v.classList.remove("occupied");
+            alert(result);
         },
         error: function (response) {
             alert('error');
@@ -294,7 +336,7 @@ function deskFill(ID, userId) {
  * function called on every location to check in the desk DB if the desk has an occupant. If so it
  * adds a css class to the element that changes its color to purple to indicate that the desk is occupied
  */
-function isOccupied(id){
+function isOccupied(id) {
     let urlPath;
     let path = window.location.pathname;
     if (path == "/") {
@@ -333,4 +375,43 @@ function isOccupied(id){
 function occupyFill(id) {
     var v = document.getElementById(id);
     return v.classList.contains("occupied");
+}
+
+/*
+ * function isAuth
+ * 
+ * calls a function to check if user has permissions then is so allows occupant removal
+ */
+function isAuth(print, ID) {
+    let urlPath;
+    let path = window.location.pathname;
+    if (path == "/") {
+        urlPath = 'Home/isAuth';
+    }
+    else {
+        urlPath = 'isAuth'
+    }
+
+    $.ajax({
+        type: "GET",
+        url: urlPath,
+        data: {},
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            if (result == "True") {
+                alert(print);
+                var remove = confirm("Would you like to remove this desk occupant? (Ok = yes)")
+                if (remove) {
+                    removeOccupant(ID);
+                }
+            }
+            else {
+                alert(print);
+            }
+        },
+        error: function (response) {
+            alert("Error");
+        }
+    });
 }

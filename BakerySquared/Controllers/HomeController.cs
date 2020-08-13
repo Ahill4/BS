@@ -218,6 +218,65 @@ namespace BakerySquared.Controllers
         }
 
         /// <summary>
+        /// checks if user is logged in
+        /// </summary>
+        /// <returns>string containing if user is logged in</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult isAuth()
+        {
+            string returnString = null;
+
+            if (Request.IsAuthenticated)
+            {
+                returnString = "True";
+            }
+            else
+            {
+                returnString = "False";
+            }
+            return Json(returnString, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// removes user from passed desk 
+        /// </summary>
+        /// <param name="ID">desk id to be cleared</param>
+        /// <returns>string upon completion or error</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult RemoveOccupant(string ID)
+        {
+            string returnString = null;
+            try
+            {
+                var employees = from e in db.Employees select e;
+
+                employees = employees.Where(e => e.Desk.Contains(ID));
+
+                employees.ToList();
+
+                foreach (Employee e in employees)
+                {
+                    e.Desk = null;
+                    db.Entry(e).State = System.Data.Entity.EntityState.Modified;
+                }
+                Desk d = db.Desks.Find(ID);
+                d.Occupant = null;
+                db.Entry(d).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+                returnString = "Completed";
+            }
+            catch
+            {
+                returnString = "DB error";
+            }
+            
+
+            return Json(returnString, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// called on every location to determine if the location is occupied. if it is it
         /// changes the color of sent location
         /// </summary>
@@ -257,6 +316,7 @@ namespace BakerySquared.Controllers
         /// <param name="id">desk id</param>
         /// <param name="userId">employee id</param>
         /// <returns>returns completed upon successful addition to DB</returns>
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult deskFill(string id, string userId)
         {

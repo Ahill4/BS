@@ -183,7 +183,7 @@ namespace BakerySquared.Controllers
 
                 if (desk == null)
                 {
-                    result = HttpNotFound();
+                    result = View("Error");
                 }
                 else
                 {
