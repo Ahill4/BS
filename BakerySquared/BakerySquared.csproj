@@ -330,6 +330,7 @@
     <Content Include="Views\Home\Floor7.cshtml" />
     <Content Include="Views\Shared\Forms.cshtml" />
     <Content Include="Views\Account\UserSetPasswordConfirmation.cshtml" />
+    <Content Include="Views\Floors\SVG_Guide.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
