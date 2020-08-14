@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -19,11 +20,12 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
 using BakerySquared.Controllers;
-using BSDB.Models;
+//using BSDB.Models;
+using BakerySquared.Models;
 using Microsoft.Ajax.Utilities;
 using PagedList;
 
-namespace BSDB.Controllers
+namespace BakerySquared.Controllers
 {
     /// <summary>
     /// Controller for the Employee table of the database
@@ -31,6 +33,8 @@ namespace BSDB.Controllers
     public class EmployeesController : Controller
     {
         private BakerySquareDirectoryEntities db = new BakerySquareDirectoryEntities();
+
+        private static String prevDesk = "";
 
         /// <summary>
         /// handles the search and sort functionality
@@ -195,14 +199,17 @@ namespace BSDB.Controllers
             Boolean deskFound = false;
             Boolean deskEmpty = true;
 
-            Desk d = new Desk();
-
             if (employee.Desk.IsNullOrWhiteSpace())
             {
+                result = RedirectToAction("Index");
                 deskFound = true;
+                db.Employees.Add(employee);
+                db.SaveChanges();
             }
             else
             {
+                Desk d = new Desk();
+
                 d = db.Desks.Find(employee.Desk);
 
                 if (d == null)
@@ -219,23 +226,26 @@ namespace BSDB.Controllers
                         ViewBag.message = "This desk is already occupied by " + d.Occupant;
                     }
                 }
+
+                if (ModelState.IsValid && deskFound == true && deskEmpty == true)
+                {
+
+                    db.Employees.Add(employee);
+                    db.Desks.Attach(d);
+                    db.Desks.Remove(d);
+                    db.SaveChanges();
+                    d.Occupant = employee.Name;
+                    db.Desks.Add(d);
+                    db.SaveChanges();
+                    result = RedirectToAction("Index");
+                }
+                else
+                {
+                    result = View(employee);
+                }
             }
             
-            if (ModelState.IsValid && deskFound == true && deskEmpty == true)
-            {
-                db.Employees.Add(employee);
-                db.Desks.Remove(d);
-                db.SaveChanges();
-                d.Occupant = employee.Name;
-                db.Desks.Add(d);
-                db.SaveChanges();
-                result = RedirectToAction("Index");
-
-            }
-            else
-            {
-                result = View(employee);
-            }
+            
 
             return result;
         }
@@ -248,6 +258,7 @@ namespace BSDB.Controllers
         public ActionResult Edit(string id)
         {
             ActionResult result = null;
+            prevDesk = "";
 
             if (id == null)
             {
@@ -262,6 +273,7 @@ namespace BSDB.Controllers
                 }
                 else
                 {
+                    prevDesk = employee.Desk;
                     result = View(employee);
                 }
             }
@@ -304,10 +316,12 @@ namespace BSDB.Controllers
         {
             ActionResult result = null;
 
+            String name = employee.Name;
+
             Boolean b = true;
             if (!employee.Desk.IsNullOrWhiteSpace())
             {
-                Desk desk = db.Desks.Find(employee.Desk);
+                Desk desk = db.Desks.Find(employee.Desk.Trim());
                 if (desk == null)
                 {
                     b = false;
@@ -325,10 +339,26 @@ namespace BSDB.Controllers
                         b = true;
                         db.Desks.Remove(desk);
                         db.SaveChanges();
-                        desk.Occupant = employee.Name;
+                        desk.Occupant = name;
                         db.Desks.Add(desk);
                         db.SaveChanges();
                     }
+                }
+            }
+            else //--------------------TEST THIS--------------------
+            {
+                foreach (Desk d in db.Desks.ToArray())
+                {
+                    if(!d.Occupant.IsNullOrWhiteSpace())
+                    {
+                        if (d.Occupant.Trim().Equals(employee.Name.Trim()))
+                        {
+                            d.Occupant = null;
+                            db.Desks.Remove(d);
+                            db.SaveChanges();
+                            db.Desks.Add(d);
+                        }
+                    }                   
                 }
             }
 
@@ -343,6 +373,25 @@ namespace BSDB.Controllers
                 result = View(employee);
             }
 
+            if(prevDesk!=null)
+            {
+                if (!prevDesk.Equals(employee.Desk))
+                {
+                    Desk prevD = new Desk();
+                    Desk newDesk = new Desk();
+                    prevD = db.Desks.Find(prevDesk);
+                    newDesk = db.Desks.Find(employee.Desk);
+                    if (newDesk != null)
+                    {
+                        db.Desks.Remove(prevD);
+                        db.SaveChanges();
+                        prevD.Occupant = null;
+                        db.Desks.Add(prevD);
+                        db.SaveChanges();
+                    }
+                }
+            }
+            
             return result;
         }
 
@@ -383,6 +432,16 @@ namespace BSDB.Controllers
             Employee employee = db.Employees.Find(id);
             db.Employees.Remove(employee);
             db.SaveChanges();
+            if (!employee.Desk.IsNullOrWhiteSpace())
+            {
+                Desk d = db.Desks.Find(employee.Desk);
+                d.Occupant = null;
+                db.Desks.Remove(d);
+                db.SaveChanges();
+                db.Desks.Add(d);
+                db.SaveChanges();
+            }
+            
             return RedirectToAction("Index");
         }
 
