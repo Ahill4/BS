@@ -16,16 +16,16 @@ You can press (ctrl+shift+D) to open the document properties which is where you 
 custom size set width: 375 and height: 260, and the units to mm. Those values provide the extra space required to allow for movement in the div
 container while zoomed in. Once your background is set up you will have to position your base floor plan in the standard spot. 
 To do this in inkscape the top tool bar haas x, y, w, and h values you can set for the image. Select the base floor plan and set
-X: 15, Y: 0, W: 240, and H: 149. For the future work of adjusting to screen size thesse values and the document properties values will likely
+X: 15, Y: 0, W: 240, and H: 149. For the future work of adjusting to screen size these values and the document properties values will likely
 have to be changed.
 
 ##Base layer
 
 If the floor plan was imported as an image then it will be of lower quality but there won't require cleaning up extra objects.
 If it is imported from a pdf or something else as was given for the originals then you will have to clean up extra objects from the
-source. To do this you can open the objects tab, tere will be a list of specific objects. go through each element and use your judgement 
-to decide if you should delete them. General rule if you cant see the selection it can be deleted and if you can see the selection
-then decide based on whether you think it is necessary.  Any text can be removed and any empyt box can be deleted so you can enable and disable
+source. To do this you can open the objects tab, there will be a list of specific objects. go through each element and use your judgement 
+to decide if you should delete them. General rule, if you cant see the selection it can be deleted and if you can see the selection
+then decide based on whether you think it is necessary.  Any text can be removed and any empyt box can be deleted, you can enable and disable
 its visibility to determine if it has any effect on the image.
 
 ##Layers
@@ -36,7 +36,7 @@ make sure you are placing them on the appropriate layers so that the right css c
 
 ##Locations
 
-The locations must be made as eithe a rect or a path so that they can receive the hover effects from the css.  Just add the locations on the right 
+The locations must be made as either a rect or a path so that they can receive the hover effects from the css.  Just add the locations on the right 
 layer and by tracing where it looks like they should go on the floor plan.  Also each location will need to be set with its own id which
 can be set in the object properties tab. The id will have to follow a specific regex pattern of [A-Z][0-9]{4} for it work with the current code
 also no 2 ids can be the same so you will have to keep track of what ids are provided and iterate accordingly. Addtionally the number immediatly 
@@ -48,7 +48,7 @@ i recommend setting the title to match the id as when you hover over the object 
 Once all objects are completed you will have to set specific fill and stroke to make sure that nothing is applied and they can take the css.
 To do this open the fill and stroke tab then select all and under fill click on the element that looks like a question mark. This unsets the paint.
 You also need to select the object that looks like a heart with a hole in it to make sure no intersections mess with coloring. Once those are
-selected and you still have all the locations selected ake sure the blur is set to 0 and the opacity is set to 100 on both the fill and stroke tab
+selected and you still have all the locations selected make sure the blur is set to 0 and the opacity is set to 100 on both the fill and stroke tab
 and on the layers tab for each layer.
 
 ##Save and final edits
